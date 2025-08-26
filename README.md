@@ -4,7 +4,7 @@ Generate node_modules.nix from bun.lock
 
 ## Usage
 
-Add `postinstall` script to your `package.json`:
+Add `postinstall` script to your `package.json`, then run `bun install`.
 
 ```json
 {
