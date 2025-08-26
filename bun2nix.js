@@ -44,11 +44,12 @@ const depsStrArr = await Promise.all(Object.entries(lockfile.packages).map(depSt
 const depsStr = depsStrArr
   .flat()
   .filter((line) => line !== undefined)
-  .map((line) => `  ${line}`)
+  .map((line) => `    ${line}`)
   .join("\n");
 
 console.log(`{ pkgs }:
 let
+  lib = pkgs.lib;
   extract =
     src:
     pkgs.runCommand "extracted-\${src.name}" { } ''
@@ -62,7 +63,16 @@ let
         --no-same-permissions
       chmod -R a+X "$out"
     '';
-in
-pkgs.linkFarm "node_modules" {
+  packages = {
 ${depsStr}
-}`);
+  };
+  mergePackages = lib.pipe packages [
+    (lib.mapAttrsToList (name: pkg: ''cp --recursive --dereference \${pkg} "$out/\${name}" ''))
+    (lib.concatStringsSep "\\n")
+  ];
+in
+pkgs.runCommand "node_modules" { } ''
+  mkdir --parents "$out"
+  \${mergePackages}
+''
+`);

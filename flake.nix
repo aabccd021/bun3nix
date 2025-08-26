@@ -17,13 +17,13 @@
         programs.biome.settings.formatter.lineWidth = 100;
       };
 
-      node_modules = import ./node_modules.nix { inherit pkgs; };
+      packages.node_modules = import ./node_modules.nix { inherit pkgs; };
 
       packages.formatting = treefmtEval.config.build.check self;
 
       packages.bundleJs = pkgs.runCommand "bundle-js" { } ''
         mkdir "$out"
-        ln -s ${node_modules} ./node_modules
+        ln -s ${packages.node_modules} ./node_modules
         cp -Lr ${./bun2nix.js} ./bun2nix.js
         ${pkgs.bun}/bin/bun build ./bun2nix.js \
           --target=bun --minify --sourcemap=inline --outfile "$out/bun2nix.js"
@@ -50,10 +50,10 @@
         '';
       };
 
-      test_node_modules = import ./test/node_modules.nix { inherit pkgs; };
+      packages.test_node_modules = import ./test/node_modules.nix { inherit pkgs; };
 
       packages.test-run = pkgs.runCommand "test-run" { } ''
-        cp -Lr ${test_node_modules} ./node_modules
+        cp -Lr ${packages.test_node_modules} ./node_modules
         cp -Lr ${./test/index.ts} ./index.ts
         ${pkgs.bun}/bin/bun ./index.ts
         ${pkgs.typescript}/bin/tsc --noEmit ./index.ts
