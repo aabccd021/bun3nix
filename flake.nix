@@ -19,6 +19,30 @@
         programs.biome.settings.formatter.lineWidth = 100;
       };
 
+      packages.test-generate = pkgs.writeShellApplication {
+        name = "test-generate";
+        runtimeInputs = [ pkgs.bun ];
+        text = ''
+          tmpdir=$(mktemp -d)
+          trap 'rm -rf $tmpdir' EXIT
+          cd "$tmpdir" || exit 1
+          bun install is-even@1.0.0
+          bun install lodash@github:lodash/lodash#8a26eb4
+          bun run ${packages.bundle}/bun2nix.js > ./node_modules.nix
+          diff --unified --color ${./test/node_modules.nix} ./node_modules.nix
+        '';
+      };
+
+      test_node_modules = import ./test/node_modules.nix { inherit pkgs; };
+
+      packages.test-run = pkgs.runCommand "test-run" { } ''
+        cp -Lr ${test_node_modules} ./node_modules
+        cp -Lr ${./test/index.ts} ./index.ts
+        ${pkgs.bun}/bin/bun ./index.ts
+        ${pkgs.typescript}/bin/tsc --noEmit ./index.ts
+        touch "$out"
+      '';
+
       node_modules = import ./node_modules.nix { inherit pkgs; };
 
       packages.formatting = treefmtEval.config.build.check self;
