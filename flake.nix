@@ -45,7 +45,9 @@
           cd "$tmpdir" || exit 1
           bun install is-even@1.0.0
           bun install lodash@github:lodash/lodash#8a26eb4
+          bun install @types/bun
           ${packages.default}/bin/bun2nix > ./node_modules.nix
+          cat ./node_modules.nix
           diff --unified --color ${./test/node_modules.nix} ./node_modules.nix
         '';
       };
