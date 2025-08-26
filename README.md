@@ -28,6 +28,19 @@ Use the generated `node_modules.nix` from your nix expression:
 }
 ```
 
+## Supported dependencies
+
+Currently npm and git dependencies are supported.
+
+```sh
+# npm dependencies
+bun install is-even@1.0.0
+
+# git dependencies
+bun install lodash@github:lodash/lodash#8a26eb4
+bun install lodash@https://github.com/lodash/lodash
+```
+
 ## Speeding up download
 
 You might be able to speed up the download of `bun2nix` by using `--inputs-from .`
