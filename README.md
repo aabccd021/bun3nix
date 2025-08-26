@@ -1,5 +1,40 @@
 # bun2nix
+
 Generate node_modules.nix from bun.lock
+
+## Usage
+
+Add `postinstall` script to your `package.json`:
+
+```json
+{
+  "scripts": {
+    "postinstall": "nix run github:aabccd021/bun2nix > node_modules.nix"
+  }
+}
+```
+
+Use the generated `node_modules.nix` from your nix expression:
+
+```nix
+
+  node_modules = import ./node_modules.nix { inherit pkgs; };
+
+  dependencyCount = pkgs.runCommand "count-deps" { } ''
+    count=$(ls ${node_modules} | wc -l)
+    echo "There are $count dependencies" > "$out"
+  '';
+```
+
+## Speeding up download
+
+You might be able to speed up the download of `bun2nix` by using `--inputs-from .`
+if you already have a `flake.nix` in your project:
+
+```sh
+nix run --inputs-from . github:aabccd021/bun2nix > node_modules.nix
+```
+
 
 ## LICENCE
 

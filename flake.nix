@@ -19,6 +19,13 @@
 
       packages.node_modules = import ./node_modules.nix { inherit pkgs; };
 
+      node_modules = import ./node_modules.nix { inherit pkgs; };
+
+      packages.dependencyCount = pkgs.runCommand "count-deps" { } ''
+        count=$(ls ${node_modules} | wc -l)
+        echo "There are $count dependencies" > "$out"
+      '';
+
       packages.formatting = treefmtEval.config.build.check self;
 
       packages.bundleJs = pkgs.runCommand "bundle-js" { } ''
