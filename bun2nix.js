@@ -67,12 +67,16 @@ let
 ${depsStr}
   };
   mergePackages = lib.pipe packages [
-    (lib.mapAttrsToList (name: pkg: ''cp --recursive --dereference \${pkg} "$out/\${name}" ''))
+    (lib.mapAttrsToList (
+      name: pkg: ''
+        mkdir --parents "$out/\${name}"
+        cp --recursive --dereference \${pkg}/* "$out/\${name}"
+      ''
+    ))
     (lib.concatStringsSep "\\n")
   ];
 in
 pkgs.runCommand "node_modules" { } ''
   mkdir --parents "$out"
   \${mergePackages}
-''
-`);
+''`);
