@@ -17,13 +17,15 @@ Add `postinstall` script to your `package.json`, then run `bun install`.
 Use the generated `node_modules.nix` from your nix expression:
 
 ```nix
-
+{ pkgs, ... }:
+{
   node_modules = import ./node_modules.nix { inherit pkgs; };
 
   dependencyCount = pkgs.runCommand "count-deps" { } ''
     count=$(ls ${node_modules} | wc -l)
     echo "There are $count dependencies" > "$out"
   '';
+}
 ```
 
 ## Speeding up download
