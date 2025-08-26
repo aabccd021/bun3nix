@@ -25,8 +25,7 @@
         mkdir "$out"
         ln -s ${packages.node_modules} ./node_modules
         cp -Lr ${./bun2nix.js} ./bun2nix.js
-        ${pkgs.bun}/bin/bun build ./bun2nix.js \
-          --target=bun --minify --sourcemap=inline --outfile "$out/bun2nix.js"
+        ${pkgs.bun}/bin/bun build ./bun2nix.js --target=bun --minify --outfile "$out/bun2nix.js"
       '';
 
       packages.default = pkgs.writeShellApplication {
