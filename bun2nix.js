@@ -14,13 +14,11 @@ async function depStr([name, value]) {
       await bunTagFile.delete();
       const hash = await $`nix-hash --base64 --type sha512 --sri node_modules/${name}`.text();
       return [
-        `(copyTo "${name}" (`,
-        `  pkgs.fetchgit {`,
-        `    url = "${url.origin}${url.pathname}";`,
-        `    rev = "${url.hash.substring(1)}";`,
-        `    hash = "${hash.trim()}";`,
-        `  }`,
-        `))`,
+        `"${name}" = pkgs.fetchgit {`,
+        `  url = "${url.origin}${url.pathname}";`,
+        `  rev = "${url.hash.substring(1)}";`,
+        `  hash = "${hash.trim()}";`,
+        `};`,
       ];
     } finally {
       await bunTagFile.write(bunTag);
@@ -30,12 +28,12 @@ async function depStr([name, value]) {
   // npm dependencies
   const tarballName = path.basename(val0).replaceAll("@", "-");
   return [
-    `(extractTo "${name}" (`,
+    `"${name}" = extract (`,
     `  pkgs.fetchurl {`,
     `    url = "https://registry.npmjs.org/${name}/-/${tarballName}.tgz";`,
     `    hash = "${val3}";`,
     `  }`,
-    `))`,
+    `);`,
   ];
 }
 
@@ -46,34 +44,25 @@ const depsStrArr = await Promise.all(Object.entries(lockfile.packages).map(depSt
 const depsStr = depsStrArr
   .flat()
   .filter((line) => line !== undefined)
-  .map((line) => `    ${line}`)
+  .map((line) => `  ${line}`)
   .join("\n");
 
 console.log(`{ pkgs }:
 let
-  extractTo =
-    out_path: src:
-    pkgs.runCommand "node_modules-\${out_path}" { } ''
-      mkdir -p $out/\${out_path}
+  extract =
+    src:
+    pkgs.runCommand "extracted-\${src.name}" { } ''
+      mkdir -p "$out"
       \${pkgs.libarchive}/bin/bsdtar \\
         --extract \\
         --file "\${src}" \\
-        --directory $out/\${out_path} \\
+        --directory "$out" \\
         --strip-components=1 \\
         --no-same-owner \\
         --no-same-permissions
-      chmod -R a+X $out/\${out_path}
-    '';
-  copyTo =
-    out_path: src:
-    pkgs.runCommand "node_modules-\${out_path}" { } ''
-      mkdir -p $out
-      cp -Lr \${src}/ $out/\${out_path}
+      chmod -R a+X "$out"
     '';
 in
-pkgs.symlinkJoin {
-  name = "node_modules";
-  paths = [
+pkgs.linkFarm "node_modules" {
 ${depsStr}
-  ];
 }`);

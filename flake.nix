@@ -17,6 +17,25 @@
         programs.biome.settings.formatter.lineWidth = 100;
       };
 
+      node_modules = import ./node_modules.nix { inherit pkgs; };
+
+      packages.formatting = treefmtEval.config.build.check self;
+
+      packages.bundleJs = pkgs.runCommand "bundle-js" { } ''
+        mkdir "$out"
+        ln -s ${node_modules} ./node_modules
+        cp -Lr ${./bun2nix.js} ./bun2nix.js
+        ${pkgs.bun}/bin/bun build ./bun2nix.js \
+          --target=bun --minify --sourcemap=inline --outfile "$out/bun2nix.js"
+      '';
+
+      packages.default = pkgs.writeShellApplication {
+        name = "bun2nix";
+        text = ''
+          exec bun run ${packages.bundleJs}/bun2nix.js "$@";
+        '';
+      };
+
       packages.test-generate = pkgs.writeShellApplication {
         name = "test-generate";
         runtimeInputs = [ pkgs.bun ];
@@ -26,7 +45,7 @@
           cd "$tmpdir" || exit 1
           bun install is-even@1.0.0
           bun install lodash@github:lodash/lodash#8a26eb4
-          bun run ${packages.bundle}/bun2nix.js > ./node_modules.nix
+          ${packages.default}/bin/bun2nix > ./node_modules.nix
           diff --unified --color ${./test/node_modules.nix} ./node_modules.nix
         '';
       };
@@ -39,18 +58,6 @@
         ${pkgs.bun}/bin/bun ./index.ts
         ${pkgs.typescript}/bin/tsc --noEmit ./index.ts
         touch "$out"
-      '';
-
-      node_modules = import ./node_modules.nix { inherit pkgs; };
-
-      packages.formatting = treefmtEval.config.build.check self;
-
-      packages.bundle = pkgs.runCommand "bun2nix.js" { } ''
-        mkdir "$out"
-        ln -s ${node_modules} ./node_modules
-        cp -Lr ${./bun2nix.js} ./bun2nix.js
-        ${pkgs.bun}/bin/bun build ./bun2nix.js \
-          --target=bun --minify --sourcemap=inline --outfile "$out/bun2nix.js"
       '';
 
     in
