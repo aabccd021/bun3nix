@@ -7,8 +7,6 @@
   outputs =
     { self, ... }@inputs:
     let
-      lib = inputs.nixpkgs.lib;
-
       pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
 
       treefmtEval = inputs.treefmt-nix.lib.evalModule pkgs {
