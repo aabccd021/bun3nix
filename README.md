@@ -30,13 +30,13 @@ Use the generated `node_modules.nix` from your nix expression:
 
 ## Supported dependencies
 
-Currently npm and git dependencies are supported.
+Currently npm and github dependencies are supported.
 
 ```sh
 # npm dependencies
 bun install is-even@1.0.0
 
-# git dependencies
+# github dependencies
 bun install lodash@github:lodash/lodash#8a26eb4
 bun install lodash@https://github.com/lodash/lodash
 ```
