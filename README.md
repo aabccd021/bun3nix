@@ -1,4 +1,4 @@
-# bun2nix
+# bun2node_modules
 
 Generate node_modules.nix from bun.lock
 
@@ -9,7 +9,7 @@ Add `postinstall` script to your `package.json`, then run `bun install`.
 ```json
 {
   "scripts": {
-    "postinstall": "nix run github:aabccd021/bun2nix > node_modules.nix"
+    "postinstall": "nix run github:aabccd021/bun2node_modules > node_modules.nix"
   }
 }
 ```
@@ -43,11 +43,11 @@ bun install lodash@https://github.com/lodash/lodash
 
 ## Speeding up download
 
-You might be able to speed up the download of `bun2nix` by using `--inputs-from .`
+You might be able to speed up the download of `bun2node_modules` by using `--inputs-from .`
 if you already have a `flake.nix` in your project:
 
 ```sh
-nix run --inputs-from . github:aabccd021/bun2nix > node_modules.nix
+nix run --inputs-from . github:aabccd021/bun2node_modules > node_modules.nix
 ```
 
 

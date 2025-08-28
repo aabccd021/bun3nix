@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import { $ } from "bun";
 
-async function depStr([name, value]) {
+async function packageStrPromise([name, value]) {
   const [val0, _val1, _val2, val3] = value;
 
   // git dependencies
@@ -39,9 +39,10 @@ async function depStr([name, value]) {
 const jsonc = await Bun.file("bun.lock").text();
 const json = jsonc.replace(/,(\s*[}\]])/g, "$1");
 const lockfile = JSON.parse(json);
-const depsStrArr = await Promise.all(Object.entries(lockfile.packages).map(depStr));
+const packageStrPromises = Object.entries(lockfile.packages).map(packageStrPromise);
+const packageStrList = await Promise.all(packageStrPromises);
 
-const depsStr = depsStrArr
+const packageStr = packageStrList
   .flat()
   .filter((line) => line !== undefined)
   .map((line) => `    ${line}`)
@@ -64,7 +65,7 @@ let
       chmod -R a+X "$out"
     '';
   packages = {
-${depsStr}
+${packageStr}
   };
   mergePackages = lib.pipe packages [
     (lib.mapAttrsToList (

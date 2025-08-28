@@ -20,9 +20,9 @@
       packages.formatting = treefmtEval.config.build.check self;
 
       packages.default = pkgs.writeShellApplication {
-        name = "bun2nix";
+        name = "bun2node_modules";
         text = ''
-          exec bun run ${./bun2nix.js} "$@";
+          exec bun run ${./index.js} "$@";
         '';
       };
 
@@ -36,7 +36,7 @@
           bun install is-even@1.0.0
           bun install lodash@github:lodash/lodash#8a26eb4
           bun install @types/bun@1.2.21
-          ${packages.default}/bin/bun2nix > ./node_modules.nix
+          ${packages.default}/bin/bun2node_modules > ./node_modules.nix
           diff --unified --color ${./test/node_modules.nix} ./node_modules.nix
         '';
       };
