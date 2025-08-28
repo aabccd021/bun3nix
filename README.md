@@ -1,6 +1,6 @@
 # bun2node_modules
 
-Generate node_modules.nix from bun.lock
+Generate `node_modules.nix` from `bun.lock`.
 
 ## Usage
 
@@ -9,7 +9,7 @@ Add `postinstall` script to your `package.json`, then run `bun install`.
 ```json
 {
   "scripts": {
-    "postinstall": "curl -fsSL https://raw.githubusercontent.com/aabccd021/bun2nix/refs/heads/main/index.js | bun - > ./node_modules.nix"
+    "postinstall": "curl -fsSL https://raw.githubusercontent.com/aabccd021/bun2node_modules/refs/heads/main/index.js | bun - > ./node_modules.nix"
   }
 }
 ```
@@ -28,14 +28,14 @@ Use the generated `node_modules.nix` from your nix expression:
 }
 ```
 
-## Using the script as flake input
+## Using the JS file as flake input
 
 Here is how I personally do it
 
 ```nix
 {
   inputs.bun2node_modules = {
-    url = "https://raw.githubusercontent.com/aabccd021/bun2nix/refs/heads/main/index.js";
+    url = "https://raw.githubusercontent.com/aabccd021/bun2node_modules/refs/heads/main/index.js";
     flake = false;
   };
 
