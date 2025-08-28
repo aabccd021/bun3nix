@@ -9,7 +9,7 @@ Add `postinstall` script to your `package.json`, then run `bun install`.
 ```json
 {
   "scripts": {
-    "postinstall": "nix run github:aabccd021/bun2node_modules > node_modules.nix"
+    "postinstall": "curl -fsSL https://raw.githubusercontent.com/aabccd021/bun2nix/refs/heads/main/index.js | bun - > ./node_modules.nix"
   }
 }
 ```
@@ -28,6 +28,37 @@ Use the generated `node_modules.nix` from your nix expression:
 }
 ```
 
+## Using the script as flake input
+
+Here is how I personally do it
+
+```nix
+{
+  inputs.bun2node_modules = {
+    url = "https://raw.githubusercontent.com/aabccd021/bun2nix/refs/heads/main/index.js";
+    flake = false;
+  };
+
+  outputs = inputs: 
+  let
+    pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
+  in
+  {
+    packages.x86_64-linux.postinstall = pkgs.writeShellScriptBin "postinstall" ''
+      exec ${pkgs.bun}/bin/bun ${inputs.bun2node_modules} "$@" > ./node_modules.nix
+    '';
+  };
+}
+```
+
+```json
+{
+  "scripts": {
+    "postinstall": "nix run .#postinstall"
+  }
+}
+```
+
 ## Supported dependencies
 
 Currently npm and github dependencies are supported.
@@ -40,7 +71,6 @@ bun install is-even@1.0.0
 bun install lodash@github:lodash/lodash#8a26eb4
 bun install lodash@https://github.com/lodash/lodash
 ```
-
 
 ## LICENCE
 
