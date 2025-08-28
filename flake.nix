@@ -17,28 +17,12 @@
         programs.biome.settings.formatter.lineWidth = 100;
       };
 
-      packages.node_modules = import ./node_modules.nix { inherit pkgs; };
-
-      node_modules = import ./node_modules.nix { inherit pkgs; };
-
-      packages.dependencyCount = pkgs.runCommand "count-deps" { } ''
-        count=$(ls ${node_modules} | wc -l)
-        echo "There are $count dependencies" > "$out"
-      '';
-
       packages.formatting = treefmtEval.config.build.check self;
-
-      packages.bundleJs = pkgs.runCommand "bundle-js" { } ''
-        mkdir "$out"
-        ln -s ${packages.node_modules} ./node_modules
-        cp -Lr ${./bun2nix.js} ./bun2nix.js
-        ${pkgs.bun}/bin/bun build ./bun2nix.js --target=bun --minify --outfile "$out/bun2nix.js"
-      '';
 
       packages.default = pkgs.writeShellApplication {
         name = "bun2nix";
         text = ''
-          exec bun run ${packages.bundleJs}/bun2nix.js "$@";
+          exec bun run ${./bun2nix.js} "$@";
         '';
       };
 
@@ -51,7 +35,7 @@
           cd "$tmpdir" || exit 1
           bun install is-even@1.0.0
           bun install lodash@github:lodash/lodash#8a26eb4
-          bun install @types/bun
+          bun install @types/bun@1.2.21
           ${packages.default}/bin/bun2nix > ./node_modules.nix
           diff --unified --color ${./test/node_modules.nix} ./node_modules.nix
         '';

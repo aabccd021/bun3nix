@@ -1,6 +1,5 @@
 import * as path from "node:path";
 import { $ } from "bun";
-import { parse } from "jsonc-parser";
 
 async function depStr([name, value]) {
   const [val0, _val1, _val2, val3] = value;
@@ -37,8 +36,9 @@ async function depStr([name, value]) {
   ];
 }
 
-const lockfile = parse(await Bun.file("bun.lock").text());
-
+const jsonc = await Bun.file("bun.lock").text();
+const json = jsonc.replace(/,(\s*[}\]])/g, "$1");
+const lockfile = JSON.parse(json);
 const depsStrArr = await Promise.all(Object.entries(lockfile.packages).map(depStr));
 
 const depsStr = depsStrArr
