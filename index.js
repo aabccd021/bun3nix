@@ -27,7 +27,7 @@ async function packageStrPromise([name, value]) {
   // npm dependencies
   const tarballName = path.basename(val0).replaceAll("@", "-");
   return [
-    `"${name}" = extract (`,
+    `"${name}" = extractTarball (`,
     `  pkgs.fetchurl {`,
     `    url = "https://registry.npmjs.org/${name}/-/${tarballName}.tgz";`,
     `    hash = "${val3}";`,
@@ -51,7 +51,7 @@ const packageStr = packageStrList
 console.log(`{ pkgs }:
 let
   lib = pkgs.lib;
-  extract =
+  extractTarball =
     src:
     pkgs.runCommand "extracted-\${src.name}" { } ''
       mkdir -p "$out"
