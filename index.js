@@ -57,12 +57,12 @@ let
       mkdir -p "$out"
       \${pkgs.libarchive}/bin/bsdtar \\
         --extract \\
-        --file "\${src}" \\
+        --file \${src} \\
         --directory "$out" \\
         --strip-components=1 \\
         --no-same-owner \\
         --no-same-permissions
-      chmod -R a+X "$out"
+      chmod -R u+rwX "$out"
     '';
   packages = {
 ${packageStr}
