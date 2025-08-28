@@ -41,15 +41,6 @@ bun install lodash@github:lodash/lodash#8a26eb4
 bun install lodash@https://github.com/lodash/lodash
 ```
 
-## Speeding up download
-
-You might be able to speed up the download of `bun2node_modules` by using `--inputs-from .`
-if you already have a `flake.nix` in your project:
-
-```sh
-nix run --inputs-from . github:aabccd021/bun2node_modules > node_modules.nix
-```
-
 
 ## LICENCE
 

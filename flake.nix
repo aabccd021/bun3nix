@@ -37,17 +37,17 @@
           bun install lodash@github:lodash/lodash#8a26eb4
           bun install @types/bun@1.2.21
           ${packages.default}/bin/bun2node_modules > ./node_modules.nix
-          diff --unified --color ${./test/node_modules.nix} ./node_modules.nix
+          diff --unified --color ${./test_node_modules.nix} ./node_modules.nix
         '';
       };
 
-      packages.test_node_modules = import ./test/node_modules.nix { inherit pkgs; };
+      packages.test_node_modules = import ./test_node_modules.nix { inherit pkgs; };
 
       packages.test-run = pkgs.runCommand "test-run" { } ''
         cp -Lr ${packages.test_node_modules} ./node_modules
-        cp -Lr ${./test/index.ts} ./index.ts
-        ${pkgs.bun}/bin/bun ./index.ts
-        ${pkgs.typescript}/bin/tsc --noEmit ./index.ts
+        cp -Lr ${./test.ts} ./test.ts
+        ${pkgs.bun}/bin/bun ./test.ts
+        ${pkgs.typescript}/bin/tsc --noEmit ./test.ts
         touch "$out"
       '';
 
