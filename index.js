@@ -48,7 +48,7 @@ const packageStr = packageStrList
   .map((line) => `    ${line}`)
   .join("\n");
 
-console.log(`{ pkgs }:
+console.log(`{ pkgs, ... }:
 let
   lib = pkgs.lib;
   extractTarball =
