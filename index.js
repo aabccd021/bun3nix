@@ -70,7 +70,5 @@ ${packageStr}
     (lib.concatStringsSep "\\n")
   ];
 in
-pkgs.runCommand "node_modules" { } ''
-  mkdir -p "$out"
-  \${mergePackages}
-''`);
+pkgs.runCommand "node_modules" { } mergePackages
+`);
