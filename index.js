@@ -55,7 +55,7 @@ let
     src:
     pkgs.runCommand "extracted-\${src.name}" { } ''
       mkdir -p "$out"
-      \${pkgs.libarchive}/bin/bsdtar -xf \${src} -C "$out" --strip-components=1
+      \${pkgs.libarchive}/bin/bsdtar -xf \${src} --strip-components 1 -C "$out"
     '';
   packages = {
 ${packageStr}
