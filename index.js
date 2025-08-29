@@ -54,7 +54,7 @@ let
   extractTarball =
     src:
     pkgs.runCommand "extracted-\${src.name}" { } ''
-      mkdir -p "$out"
+      mkdir "$out"
       \${pkgs.libarchive}/bin/bsdtar -xf \${src} --strip-components 1 -C "$out"
     '';
   packages = {
