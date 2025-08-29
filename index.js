@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import { $ } from "bun";
 
-async function packageStrPromise([name, value]) {
+async function packageTextPromise([name, value]) {
   const [val0, _val1, _val2, val3] = value;
 
   // git dependencies
@@ -36,13 +36,13 @@ async function packageStrPromise([name, value]) {
   ];
 }
 
-const jsonc = await Bun.file("bun.lock").text();
-const json = jsonc.replace(/,(\s*[}\]])/g, "$1");
-const lockfile = JSON.parse(json);
-const packageStrPromises = Object.entries(lockfile.packages).map(packageStrPromise);
-const packageStrList = await Promise.all(packageStrPromises);
+const bunLockJsonc = await Bun.file("bun.lock").text();
+const bunLockJson = bunLockJsonc.replace(/,(\s*[}\]])/g, "$1");
+const bunLock = JSON.parse(bunLockJson);
+const packageTextPromises = Object.entries(bunLock.packages).map(packageTextPromise);
+const packageTexts = await Promise.all(packageTextPromises);
 
-const packageStr = packageStrList
+const packageText = packageTexts
   .flat()
   .filter((line) => line !== undefined)
   .map((line) => `    ${line}`)
@@ -58,7 +58,7 @@ let
       \${pkgs.libarchive}/bin/bsdtar -xf \${src} --strip-components 1 -C "$out"
     '';
   packages = {
-${packageStr}
+${packageText}
   };
 in
 lib.pipe packages [
