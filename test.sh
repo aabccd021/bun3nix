@@ -6,14 +6,12 @@ tmpdir=$(mktemp -d)
 trap 'rm -rf $tmpdir' EXIT
 cd "$tmpdir" || exit 1
 
-nix run nixpkgs#bun install is-even@1.0.0
-nix run nixpkgs#bun install lodash@github:lodash/lodash#8a26eb4
-nix run nixpkgs#bun install @types/bun@1.2.21
+nix run nixpkgs#bun install is-even@1.0.0 lodash@github:lodash/lodash#8a26eb4 @types/bun@1.2.21
 
 nix run nixpkgs#bun run "$index_js" > ./node_modules.nix
 rm -rf ./node_modules
 cp -Lr "$(nix-build --arg pkgs "import <nixpkgs> {}" ./node_modules.nix --no-out-link)" ./node_modules
-chmod -R a+w ./node_modules
+chmod -R u+rwX ./node_modules
 
 {
   echo "import isEven from 'is-even';"
