@@ -60,15 +60,15 @@ let
   packages = {
 ${packageStr}
   };
-  mergePackages = lib.pipe packages [
-    (lib.mapAttrsToList (
-      name: package: ''
-        mkdir -p "$out/\${name}"
-        cp -Lr \${package}/* "$out/\${name}"
-      ''
-    ))
-    (lib.concatStringsSep "\\n")
-  ];
 in
-pkgs.runCommand "node_modules" { } mergePackages
+lib.pipe packages [
+  (lib.mapAttrsToList (
+    name: package: ''
+      mkdir -p "$out/\${name}"
+      cp -Lr \${package}/* "$out/\${name}"
+    ''
+  ))
+  (lib.concatStringsSep "\\n")
+  (pkgs.runCommand "node_modules" { })
+]
 `);
