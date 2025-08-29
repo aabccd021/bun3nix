@@ -10,7 +10,7 @@ nix run nixpkgs#bun install is-even@1.0.0 lodash@github:lodash/lodash#8a26eb4 @t
 
 nix run nixpkgs#bun run "$index_js" > ./node_modules.nix
 rm -rf ./node_modules
-cp -Lr "$(nix-build --no-out-link --arg pkgs "import <nixpkgs> {}" ./node_modules.nix)" ./node_modules
+cp -Lr "$(nix-build --no-out-link ./node_modules.nix)" ./node_modules
 chmod -R u+rwX ./node_modules
 
 {

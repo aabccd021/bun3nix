@@ -48,7 +48,7 @@ const packageStr = packageStrList
   .map((line) => `    ${line}`)
   .join("\n");
 
-console.log(`{ pkgs, ... }:
+console.log(`{ pkgs ? import <nixpkgs> {}, ... }:
 let
   lib = pkgs.lib;
   extractTarball =
@@ -70,5 +70,4 @@ lib.pipe packages [
   ))
   (lib.concatStringsSep "\\n")
   (pkgs.runCommand "node_modules" { })
-]
-`);
+]`);
