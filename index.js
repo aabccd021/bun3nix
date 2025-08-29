@@ -55,23 +55,16 @@ let
     src:
     pkgs.runCommand "extracted-\${src.name}" { } ''
       mkdir -p "$out"
-      \${pkgs.libarchive}/bin/bsdtar \\
-        --extract \\
-        --file \${src} \\
-        --directory "$out" \\
-        --strip-components=1 \\
-        --no-same-owner \\
-        --no-same-permissions
-      chmod -R u+rwX "$out"
+      \${pkgs.libarchive}/bin/bsdtar -xf \${src} -C "$out" --strip-components=1
     '';
   packages = {
 ${packageStr}
   };
   mergePackages = lib.pipe packages [
     (lib.mapAttrsToList (
-      name: pkg: ''
+      name: package: ''
         mkdir -p "$out/\${name}"
-        cp -Lr \${pkg}/* "$out/\${name}"
+        cp -Lr \${package}/* "$out/\${name}"
       ''
     ))
     (lib.concatStringsSep "\\n")
