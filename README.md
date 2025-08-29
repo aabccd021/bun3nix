@@ -45,7 +45,7 @@ Here is how I personally do it
   in
   {
     packages.x86_64-linux.postinstall = pkgs.writeShellScriptBin "postinstall" ''
-      exec ${pkgs.bun}/bin/bun ${inputs.bun2node_modules} "$@" > ./node_modules.nix
+      exec ${pkgs.bun}/bin/bun ${inputs.bun2node_modules} > ./node_modules.nix
     '';
   };
 }
