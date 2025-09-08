@@ -133,7 +133,6 @@ ${fetchTextLines.map((line) => `    ${line}`).join("\n")}
 in
 (pkgs.runCommand "node_modules" { buildInputs = [ pkgs.nodejs ]; } ''
   \${packageCommands}
-  mkdir -p "$out/lib/node_modules/.bin"
-${binTextLines.map((line) => `  ${line}`).join("\n")}
+  mkdir -p "$out/lib/node_modules/.bin"${binTextLines.map((line) => `\n  ${line}`).join("")}
   ln -s "$out/lib/node_modules/.bin" "$out/bin"
 '')`);
