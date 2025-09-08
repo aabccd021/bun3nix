@@ -41,18 +41,12 @@ fi
     setup_test
 
     "$index_js" "github:lodash/lodash#8a26eb4" "@types/bun@1.2.21" "is-even@1.0.0" >./node_modules.nix
-    if [ -d ./node_modules ]; then
-        echo "node_modules should not exist"
-        exit 1
-    fi
-    if [ -d ./package.json ]; then
-        echo "package.json should not exist"
-        exit 1
-    fi
-    if [ -d ./bun.lock ]; then
-        echo "bun.lock should not exist"
-        exit 1
-    fi
+    for path in ./node_modules ./package.json ./bun.lock ./bun.lockb; do
+        if [ -e "$path" ]; then
+            echo "$path should not exist"
+            exit 1
+        fi
+    done
     cp -Lr "$(nix-build --no-out-link ./node_modules.nix)/lib/node_modules" ./node_modules
     chmod -R u+rwX ./node_modules
 
