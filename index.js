@@ -115,10 +115,11 @@ const binText = pkgsInfos
       return [];
     }
     return Object.entries(val2.bin).flatMap(([binName, binPath]) => [
-      `    patchShebangs --host "$out/lib/node_modules/${modulePath}/${binPath}"`,
-      `    ln -s "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
+      `patchShebangs --host "$out/lib/node_modules/${modulePath}/${binPath}"`,
+      `ln -s "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
     ]);
   })
+  .map((line) => `    ${line}`)
   .join("\n");
 
 console.log(`{ pkgs ? import <nixpkgs> {}, ... }:
