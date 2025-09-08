@@ -57,11 +57,11 @@ const pkgInfos = Object.entries(depsMap).map(([name, { baseName, lockInfo }]) =>
     current = depsMap[current.parentName];
   }
   const modulePath = modulePaths.reverse().join("/node_modules/");
-  return { name, baseName, modulePath, lockInfo };
+  return { baseName, modulePath, lockInfo };
 });
 
 const fetchText = pkgInfos
-  .flatMap(({ lockInfo, name, baseName, modulePath }) => {
+  .flatMap(({ lockInfo, baseName, modulePath }) => {
     const nameUrl = lockInfo[0];
     const hash = lockInfo[3];
 
@@ -79,7 +79,9 @@ const fetchText = pkgInfos
     }
 
     // git dependencies
-    const url = new URL(nameUrl.replace(`${name}@`, "").replace("github:", "https://github.com/"));
+    const url = new URL(
+      nameUrl.substring(nameUrl.lastIndexOf("@") + 1).replace("github:", "https://github.com/"),
+    );
     const bunTag = fs.readFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, "utf-8");
     try {
       fs.rmSync(`${cwd}/node_modules/${modulePath}/.bun-tag`);
