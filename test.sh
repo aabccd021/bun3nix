@@ -42,8 +42,8 @@ setup_test() {
     echo '
         import isEven from "is-even";
         import _ from "lodash";
-        import { expect } from "node:test";
-        expect(_.filter([1, 2, 3], isEven).at(0)).toEqual(2);
+        import * as assert from "node:assert";
+        assert.strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
     ' >./test.ts
     # use nodejs instead of bun because bun runs fine without node_modules
     nix run nixpkgs#nodejs ./test.ts
@@ -68,7 +68,7 @@ setup_test() {
         import isEven from "is-even";
         import _ from "lodash";
         import { expect } from "node:test";
-        expect(_.filter([1, 2, 3], isEven).at(0)).toEqual(2);
+        assert.strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
     ' >./test.ts
     nix run nixpkgs#nodejs ./test.ts
     nix run nixpkgs#typescript -- --noEmit ./test.ts
