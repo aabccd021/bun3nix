@@ -3,6 +3,7 @@
 import * as child_process from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
+import * as path from "node:path";
 import * as util from "node:util";
 
 const arg = util.parseArgs({
