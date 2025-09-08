@@ -6,7 +6,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import * as util from "node:util";
 
-function mkFetchText({ cwd, lockInfo, name, baseName, modulePath }) {
+function mkFetchText({ lockInfo, name, baseName, modulePath }, cwd) {
   const nameUrl = lockInfo[0];
   const hash = lockInfo[3];
 
@@ -76,7 +76,7 @@ const bunLockJsonc = fs.readFileSync(path.join(cwd, "bun.lock"), "utf-8");
 const bunLockJson = bunLockJsonc.replace(/,(\s*[}\]])/g, "$1");
 const bunLock = JSON.parse(bunLockJson);
 
-const dependencyMap = Object.fromEntries(
+const depsMap = Object.fromEntries(
   Object.entries(bunLock.packages).map(([name, lockInfo]) => {
     const parentName = Object.keys(bunLock.packages)
       .filter((n) => name.startsWith(`${n}/`) && n !== name)
@@ -87,23 +87,23 @@ const dependencyMap = Object.fromEntries(
   }),
 );
 
-const pkgsInfos = Object.entries(dependencyMap).map(([name, { baseName, lockInfo }]) => {
+const pkgInfos = Object.entries(depsMap).map(([name, { baseName, lockInfo }]) => {
   const modulePaths = [];
-  let current = dependencyMap[name];
+  let current = depsMap[name];
   while (current !== undefined) {
     modulePaths.push(current.baseName);
-    current = dependencyMap[current.parentName];
+    current = depsMap[current.parentName];
   }
   const modulePath = modulePaths.reverse().join("/node_modules/");
   return { name, baseName, modulePath, lockInfo };
 });
 
-const fetchText = pkgsInfos
-  .flatMap((i) => mkFetchText({ ...i, cwd }))
+const fetchText = pkgInfos
+  .flatMap((pkgInfo) => mkFetchText(pkgInfo, cwd))
   .map((line) => `    ${line}`)
   .join("\n");
 
-const binText = pkgsInfos
+const binText = pkgInfos
   .flatMap(({ lockInfo, modulePath }) => {
     const bin = lockInfo[2].bin;
     return bin
