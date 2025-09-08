@@ -114,7 +114,7 @@ const binText = pkgInfos
   .map((line) => `    ${line}`)
   .join("\n");
 
-console.log(`{ 
+console.log(`{
   pkgs ? import <nixpkgs> { },
   ...
 }:
