@@ -36,7 +36,7 @@ fi
 )
 
 (
-    echo "# --package"
+    echo "# packages as arguments"
     cd_random_dir
 
     "$index_js" "github:lodash/lodash#8a26eb4" "@types/bun@1.2.21" "is-even@1.0.0" >./node_modules.nix
