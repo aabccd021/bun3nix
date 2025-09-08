@@ -25,13 +25,12 @@ fi
     cp -Lr "$(nix-build --no-out-link ./node_modules.nix)/lib/node_modules" ./node_modules
     chmod -R u+rwX ./node_modules
 
-    {
-        echo "import isEven from 'is-even';"
-        echo "import _ from 'lodash';"
-        echo "import { expect } from 'bun:test';"
-        echo "expect(_.filter([1, 2, 3], isEven).at(0)).toEqual(2);"
-    } >./test.ts
-
+    echo '
+      import isEven from "is-even";
+      import _ from "lodash";
+      import { expect } from "bun:test";
+      expect(_.filter([1, 2, 3], isEven).at(0)).toEqual(2);
+    ' >./test.ts
     nix run nixpkgs#bun ./test.ts
     nix run nixpkgs#typescript -- --noEmit ./test.ts
 )
@@ -45,13 +44,12 @@ fi
     cp -Lr "$(nix-build --no-out-link ./node_modules.nix)/lib/node_modules" ./node_modules
     chmod -R u+rwX ./node_modules
 
-    {
-        echo "import isEven from 'is-even';"
-        echo "import _ from 'lodash';"
-        echo "import { expect } from 'bun:test';"
-        echo "expect(_.filter([1, 2, 3], isEven).at(0)).toEqual(2);"
-    } >./test.ts
-
+    echo '
+      import isEven from "is-even";
+      import _ from "lodash";
+      import { expect } from "bun:test";
+      expect(_.filter([1, 2, 3], isEven).at(0)).toEqual(2);
+    ' >./test.ts
     nix run nixpkgs#bun ./test.ts
     nix run nixpkgs#typescript -- --noEmit ./test.ts
 )
