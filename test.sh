@@ -3,7 +3,7 @@ set -eu
 
 tmpdir=$(mktemp -d)
 
-cp "$(git rev-parse --show-toplevel)/index.js" "$tmpdir/bun2node_modules"
+cp "$(git rev-parse --show-toplevel)/index.js" "$tmpdir/bun3nix"
 PATH="$tmpdir:$PATH"
 export PATH
 
@@ -27,7 +27,7 @@ setup_test() {
     setup_test
 
     bun install is-even@1.0.0 lodash@github:lodash/lodash#8a26eb4 @types/bun@1.2.21
-    bun2node_modules --postinstall >./npm_deps.nix
+    bun3nix --postinstall >./npm_deps.nix
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
     nix run nixpkgs#nixfmt -- --strict ./npm_deps_formatted.nix
@@ -52,7 +52,7 @@ setup_test() {
     echo "# packages as arguments"
     setup_test
 
-    bun2node_modules github:lodash/lodash#8a26eb4 @types/bun@1.2.21 is-even@1.0.0 >./npm_deps.nix
+    bun3nix github:lodash/lodash#8a26eb4 @types/bun@1.2.21 is-even@1.0.0 >./npm_deps.nix
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
     nix run nixpkgs#nixfmt -- --strict ./npm_deps_formatted
@@ -81,7 +81,7 @@ setup_test() {
     echo "# tailwindcss with plugins"
     setup_test
 
-    bun2node_modules \
+    bun3nix \
         @iconify/json@2.2.359 \
         @iconify/tailwind4@1.0.6 \
         daisyui@5.0.46 \
@@ -119,13 +119,13 @@ setup_test() {
     echo "# tailwindcss with plugins on separate node_modules"
     setup_test
 
-    bun2node_modules \
+    bun3nix \
         @iconify/json@2.2.359 \
         @iconify/tailwind4@1.0.6 \
         daisyui@5.0.46 \
         tailwindcss@4.1.11 \
         >./plugin_deps.nix
-    bun2node_modules @tailwindcss/cli@4.1.11 >./cli_deps.nix
+    bun3nix @tailwindcss/cli@4.1.11 >./cli_deps.nix
 
     cp ./plugin_deps.nix ./plugin_deps_formatted.nix
     nix run nixpkgs#nixfmt -- --strict ./plugin_deps_formatted

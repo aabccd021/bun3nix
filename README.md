@@ -1,4 +1,4 @@
-# bun2node_modules
+# bun3nix
 
 Generate `node_modules.nix` from `bun.lock`.
 
@@ -9,7 +9,7 @@ Add `postinstall` script to your `package.json`, then run `bun install`.
 ```json
 {
   "scripts": {
-    "postinstall": "curl -fsSL https://raw.githubusercontent.com/aabccd021/bun2node_modules/refs/heads/main/index.js | bun - --postinstall > ./node_modules.nix"
+    "postinstall": "curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js | bun - --postinstall > ./node_modules.nix"
   }
 }
 ```
@@ -34,8 +34,8 @@ Here is how I personally do it
 
 ```nix
 {
-  inputs.bun2node_modules = {
-    url = "https://raw.githubusercontent.com/aabccd021/bun2node_modules/refs/heads/main/index.js";
+  inputs.bun3nix = {
+    url = "https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js";
     flake = false;
   };
 
@@ -45,7 +45,7 @@ Here is how I personally do it
   in
   {
     packages.x86_64-linux.postinstall = pkgs.writeShellScriptBin "postinstall" ''
-      exec ${pkgs.bun}/bin/bun ${inputs.bun2node_modules} > ./node_modules.nix
+      exec ${pkgs.bun}/bin/bun ${inputs.bun3nix} > ./node_modules.nix
     '';
   };
 }

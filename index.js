@@ -30,7 +30,7 @@ if (arg.values.postinstall && arg.positionals.length > 0) {
 
 let cwd = process.cwd();
 if (arg.positionals.length > 0) {
-  cwd = fs.mkdtempSync(`${os.tmpdir()}/bun2node_modules-`);
+  cwd = fs.mkdtempSync(`${os.tmpdir()}/bun3nix-`);
   child_process.execSync(`bun add ${arg.positionals.join(" ")}`, { cwd });
 }
 
@@ -96,7 +96,7 @@ const fetchTextLines = packages.flatMap(({ baseName, modulePath, lockInfo }) => 
     }
   }
 
-  throw new Error(`bun2node_modules does not support the following dependency: ${nameUrl}`);
+  throw new Error(`bun3nix does not support the following dependency: ${nameUrl}`);
 });
 
 const binTextLines = packages.flatMap(({ lockInfo, modulePath }) => {
