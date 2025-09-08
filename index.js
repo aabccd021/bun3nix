@@ -38,17 +38,6 @@ const bunLockJsonc = fs.readFileSync(path.join(cwd, "bun.lock"), "utf-8");
 const bunLockJson = bunLockJsonc.replace(/,(\s*[}\]])/g, "$1");
 const bunLock = JSON.parse(bunLockJson);
 
-// const depsMap = Object.fromEntries(
-//   Object.keys(bunLock.packages).map((name) => {
-//     const parentName = Object.keys(bunLock.packages)
-//       .filter((n) => name.startsWith(`${n}/`) && n !== name)
-//       .sort((a, b) => b.length - a.length)
-//       .at(0);
-//     const baseName = parentName ? name.substring(parentName.length + 1) : name;
-//     return [name, { parentName, baseName }];
-//   }),
-// );
-
 const pkgInfos = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
   const modulePaths = [];
   let currentName = name;
