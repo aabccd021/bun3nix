@@ -7,6 +7,7 @@
 // TODO don't use val0, val1, val2, val3 if possible
 // TODO don't use module_path
 // TODO --output
+// TODO remove all async
 
 import * as child_process from "node:child_process";
 import * as fs from "node:fs/promises";
