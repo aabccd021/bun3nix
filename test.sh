@@ -42,8 +42,8 @@ setup_test() {
     echo '
         import isEven from "is-even";
         import _ from "lodash";
-        import * as assert from "node:assert";
-        assert.strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
+        import { strictEqual } from "node:assert";
+        strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
     ' >./test.ts
     # use nodejs instead of bun because bun runs fine without node_modules
     nix run nixpkgs#nodejs ./test.ts
@@ -67,8 +67,8 @@ setup_test() {
     echo '
         import isEven from "is-even";
         import _ from "lodash";
-        import { expect } from "node:test";
-        assert.strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
+        import { strictEqual } from "node:assert";
+        strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
     ' >./test.ts
     nix run nixpkgs#nodejs ./test.ts
     nix run nixpkgs#typescript -- --noEmit ./test.ts
@@ -99,9 +99,7 @@ setup_test() {
         @plugin "daisyui";
     ' >./style.css
 
-    echo '
-      <button class="icon-[heroicons--rss-solid] btn btn-soft"></button>
-    ' >./index.html
+    echo 'button class="icon-[heroicons--rss-solid] btn btn-soft"></button>' >./index.html
 
     NODE_PATH="$deps_path/lib/node_modules" \
         "$deps_path/bin/tailwindcss" --input ./style.css --output ./output.css
