@@ -31,7 +31,7 @@ setup_test() {
     bun2node_modules --postinstall >./npm_deps.nix
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
-    nix run nixpkgs#nixfmt -- ./npm_deps_formatted.nix
+    nix run nixpkgs#nixfmt -- --strict ./npm_deps_formatted.nix
     diff -u --color=always ./npm_deps.nix ./npm_deps_formatted.nix
 
     rm -rf ./node_modules
@@ -56,7 +56,7 @@ setup_test() {
     bun2node_modules github:lodash/lodash#8a26eb4 @types/bun@1.2.21 is-even@1.0.0 >./npm_deps.nix
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
-    nix run nixpkgs#nixfmt -- ./npm_deps_formatted
+    nix run nixpkgs#nixfmt -- --strict ./npm_deps_formatted
     diff -u --color=always ./npm_deps.nix ./npm_deps_formatted.nix
 
     for path in ./node_modules ./package.json ./bun.lock ./bun.lockb; do
@@ -91,7 +91,7 @@ setup_test() {
         >./npm_deps.nix
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
-    nix run nixpkgs#nixfmt -- --check ./npm_deps_formatted
+    nix run nixpkgs#nixfmt -- --strict ./npm_deps_formatted
     diff -u --color=always ./npm_deps.nix ./npm_deps_formatted.nix
 
     deps=$(nix-build --no-out-link ./npm_deps.nix)
@@ -129,11 +129,11 @@ setup_test() {
     bun2node_modules @tailwindcss/cli@4.1.11 >./cli_deps.nix
 
     cp ./plugin_deps.nix ./plugin_deps_formatted.nix
-    nix run nixpkgs#nixfmt -- --check ./plugin_deps_formatted
+    nix run nixpkgs#nixfmt -- --strict ./plugin_deps_formatted
     diff -u --color=always ./plugin_deps.nix ./plugin_deps_formatted.nix
 
     cp ./cli_deps.nix ./cli_deps_formatted.nix
-    nix run nixpkgs#nixfmt -- --check ./cli_deps_formatted
+    nix run nixpkgs#nixfmt -- --strict ./cli_deps_formatted
     diff -u --color=always ./cli_deps.nix ./cli_deps_formatted.nix
 
     plugin_deps=$(nix-build --no-out-link ./plugin_deps.nix)
