@@ -72,7 +72,7 @@ if (arg.values.postinstall && arg.positionals.length > 0) {
 
 let cwd = process.cwd();
 if (arg.positionals.length > 0) {
-  cwd = fs.mkdtempSync(path.join(os.tmpdir(), "bun-nix-"));
+  cwd = fs.mkdtempSync(path.join(os.tmpdir(), "bun2node_modules-"));
   child_process.execSync(`bun add ${arg.positionals.join(" ")}`, { cwd });
 }
 
