@@ -105,14 +105,13 @@ const pkgsInfos = Object.entries(dependencyMap).map(([name, { baseName, pkg }]) 
 
 const fetchText = pkgsInfos
   .flatMap((i) => mkFetchText({ ...i, cwd }))
-  .filter((line) => line !== undefined)
   .map((line) => `    ${line}`)
   .join("\n");
 
 const binText = pkgsInfos
   .flatMap(({ pkg, modulePath }) => {
     const [_val0, _val1, val2, _val3] = pkg;
-    if (val2?.bin === undefined) {
+    if (!val2.bin) {
       return [];
     }
     return Object.entries(val2.bin).flatMap(([binName, binPath]) => [
