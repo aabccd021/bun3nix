@@ -81,26 +81,31 @@ const bunLockJsonc = fs.readFileSync(path.join(cwd, "bun.lock"), "utf-8");
 const bunLockJson = bunLockJsonc.replace(/,(\s*[}\]])/g, "$1");
 const bunLock = JSON.parse(bunLockJson);
 
-const dependencyEntries = Object.entries(bunLock.packages).map(([name, pkg]) => {
-  const parentName = Object.keys(bunLock.packages)
-    .filter((n) => name.startsWith(`${n}/`) && n !== name)
-    .sort((a, b) => b.length - a.length)
-    .at(0);
-  // TODO calculate baseName on bottom loop
-  const baseName = parentName !== undefined ? name.substring(parentName.length + 1) : name;
-  return [name, { parentName, baseName, pkg }];
-});
+const dependencyMap = Object.fromEntries(
+  Object.entries(bunLock.packages).map(([name, _pkg]) => {
+    const parentName = Object.keys(bunLock.packages)
+      .filter((n) => name.startsWith(`${n}/`) && n !== name)
+      .sort((a, b) => b.length - a.length)
+      .at(0);
+    return [name, parentName];
+  }),
+);
 
-// TODO: merge with entries
-const dependencyMap = Object.fromEntries(dependencyEntries);
+const pkgsInfos = Object.entries(bunLock.packages).map(([thisName, pkg]) => {
+  const _thisParentName = dependencyMap[thisName];
+  const thisBaseName =
+    parentName !== undefined ? thisName.substring(parentName.length + 1) : thisName;
 
-const pkgsInfos = Object.entries(dependencyMap).map(([name, { baseName, pkg }]) => {
+  let name = thisName;
+  let baseName = thisBaseName;
   const modulePaths = [];
-  let current = dependencyMap[name];
-  while (current !== undefined) {
-    modulePaths.push(current.baseName);
-    current = dependencyMap[current.parentName];
+  while (name !== undefined) {
+    name = parentName;
+    modulePaths.push(baseName);
+    parentName = dependencyMap[name];
+    baseName = parentName !== undefined ? parentName.substring(parentName.length + 1) : parentName;
   }
+
   const modulePath = modulePaths.reverse().join("/node_modules/");
   return { cwd, pkg, name, baseName, modulePath };
 });
