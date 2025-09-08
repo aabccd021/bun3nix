@@ -60,7 +60,8 @@ const fetchTextLines = packages.flatMap(({ baseName, modulePath, lockInfo }) => 
   const nameUrl = lockInfo[0];
   const hash = lockInfo[3];
 
-  if (hash) {
+  const isNpmDep = hash !== undefined;
+  if (isNpmDep) {
     const tarballName = path.basename(nameUrl).replaceAll("@", "-");
     return [
       `"${modulePath}" = extractTarball (`,
@@ -73,24 +74,29 @@ const fetchTextLines = packages.flatMap(({ baseName, modulePath, lockInfo }) => 
   }
 
   const identifier = nameUrl.substring(nameUrl.lastIndexOf("@") + 1);
-  const url = new URL(identifier.replace("github:", "https://github.com/"));
-  const bunTag = fs.readFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, "utf-8");
-  try {
-    fs.rmSync(`${cwd}/node_modules/${modulePath}/.bun-tag`);
-    const hash = child_process.execSync(
-      `nix-hash --base64 --type sha512 --sri ${cwd}/node_modules/${modulePath}`,
-      { encoding: "utf-8" },
-    );
-    return [
-      `"${modulePath}" = pkgs.fetchgit {`,
-      `  url = "${url.origin}${url.pathname}";`,
-      `  rev = "${url.hash.substring(1)}";`,
-      `  hash = "${hash.trim()}";`,
-      `};`,
-    ];
-  } finally {
-    fs.writeFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, bunTag);
+  const isGithubDep = identifier.startsWith("github:");
+  if (isGithubDep) {
+    const url = new URL(identifier.replace("github:", "https://github.com/"));
+    const bunTag = fs.readFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, "utf-8");
+    try {
+      fs.rmSync(`${cwd}/node_modules/${modulePath}/.bun-tag`);
+      const hash = child_process.execSync(
+        `nix-hash --base64 --type sha512 --sri ${cwd}/node_modules/${modulePath}`,
+        { encoding: "utf-8" },
+      );
+      return [
+        `"${modulePath}" = pkgs.fetchgit {`,
+        `  url = "${url.origin}${url.pathname}";`,
+        `  rev = "${url.hash.substring(1)}";`,
+        `  hash = "${hash.trim()}";`,
+        `};`,
+      ];
+    } finally {
+      fs.writeFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, bunTag);
+    }
   }
+
+  throw new Error(`bun2node_modules does not support the following dependency: ${nameUrl}`);
 });
 
 const binTextLines = packages.flatMap(({ lockInfo, modulePath }) => {
