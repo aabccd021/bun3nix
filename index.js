@@ -39,19 +39,20 @@ const bunLockJson = bunLockJsonc.replace(/,(\s*[}\]])/g, "$1");
 const bunLock = JSON.parse(bunLockJson);
 
 const depsMap = Object.fromEntries(
-  Object.entries(bunLock.packages).map(([name, lockInfo]) => {
+  Object.keys(bunLock.packages).map((name) => {
     const parentName = Object.keys(bunLock.packages)
       .filter((n) => name.startsWith(`${n}/`) && n !== name)
       .sort((a, b) => b.length - a.length)
       .at(0);
     const baseName = parentName !== undefined ? name.substring(parentName.length + 1) : name;
-    return [name, { parentName, baseName, lockInfo }];
+    return [name, { parentName, baseName }];
   }),
 );
 
-const pkgInfos = Object.entries(depsMap).map(([name, { baseName, lockInfo }]) => {
+const pkgInfos = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
   const modulePaths = [];
   let current = depsMap[name];
+  const baseName = current.baseName;
   while (current !== undefined) {
     modulePaths.push(current.baseName);
     current = depsMap[current.parentName];
