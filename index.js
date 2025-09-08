@@ -1,30 +1,26 @@
 #!/usr/bin/env bun
 
-// TODO test tailwind and plugin
-// TODO test tailwind and separated plugin
 // TODO rename pkg to lockInfo
 // TODO remove unused val1 and val2, and instead use index access
 // TODO don't use val0, val1, val2, val3 if possible
 // TODO don't use module_path
 // TODO --output
-// TODO remove all async
 
 import * as child_process from "node:child_process";
-import * as fs from "node:fs/promises";
+import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import * as util from "node:util";
 
-async function fetchTextPromise({ cwd, pkg, name, baseName, modulePath }) {
+function mkFetchText({ cwd, pkg, name, baseName, modulePath }) {
   const [val0, _val1, _val2, val3] = pkg;
 
   // git dependencies
   if (val3 === undefined) {
     const url = new URL(val0.replace(`${name}@`, "").replace("github:", "https://github.com/"));
-    const bunTagFile = Bun.file(`${cwd}/node_modules/${modulePath}/.bun-tag`);
-    const bunTag = await bunTagFile.text();
+    const bunTag = fs.readFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, "utf-8");
     try {
-      await bunTagFile.delete();
+      fs.rmSync(`${cwd}/node_modules/${modulePath}/.bun-tag`);
       const hash = child_process.execSync(
         `nix-hash --base64 --type sha512 --sri ${cwd}/node_modules/${modulePath}`,
         { encoding: "utf-8" },
@@ -37,7 +33,7 @@ async function fetchTextPromise({ cwd, pkg, name, baseName, modulePath }) {
         `};`,
       ];
     } finally {
-      await bunTagFile.write(bunTag);
+      fs.writeFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, bunTag);
     }
   }
 
@@ -77,11 +73,11 @@ if (arg.values.postinstall && arg.positionals.length > 0) {
 
 let cwd = process.cwd();
 if (arg.positionals.length > 0) {
-  cwd = await fs.mkdtemp(path.join(os.tmpdir(), "bun-nix-"));
+  cwd = fs.mkdtempSync(path.join(os.tmpdir(), "bun-nix-"));
   child_process.execSync(`bun add ${arg.positionals.join(" ")}`, { cwd });
 }
 
-const bunLockJsonc = await Bun.file(`${cwd}/bun.lock`).text();
+const bunLockJsonc = fs.readFileSync(path.join(cwd, "bun.lock"), "utf-8");
 const bunLockJson = bunLockJsonc.replace(/,(\s*[}\]])/g, "$1");
 const bunLock = JSON.parse(bunLockJson);
 
@@ -109,11 +105,8 @@ const pkgsInfos = Object.entries(dependencyMap).map(([name, { baseName, pkg }]) 
   return { cwd, pkg, name, baseName, modulePath };
 });
 
-const fetchTextPromises = pkgsInfos.map(fetchTextPromise);
-const fetchTexts = await Promise.all(fetchTextPromises);
-const fetchText = fetchTexts
-  .flat()
-  // TODO is this required ?
+const fetchText = pkgsInfos
+  .flatMap(mkFetchText)
   .filter((line) => line !== undefined)
   .map((line) => `    ${line}`)
   .join("\n");
