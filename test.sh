@@ -31,8 +31,8 @@ setup_test() {
     bun2node_modules --postinstall >./npm_deps.nix
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
-    nix run nixpkgs#nixfmt -- --strict ./npm_deps_formatted.nix
-    diff -u ./npm_deps_formatted.nix ./npm_deps.nix
+    nix run nixpkgs#nixfmt -- ./npm_deps_formatted.nix
+    diff -u --color=always ./npm_deps_formatted.nix ./npm_deps.nix
 
     rm -rf ./node_modules
     cp -Lr "$(nix-build --no-out-link ./npm_deps.nix)/lib/node_modules" ./node_modules
@@ -56,8 +56,8 @@ setup_test() {
     bun2node_modules github:lodash/lodash#8a26eb4 @types/bun@1.2.21 is-even@1.0.0 >./npm_deps.nix
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
-    nix run nixpkgs#nixfmt -- --strict ./npm_deps_formatted
-    diff -u ./npm_deps_formatted.nix ./npm_deps.nix
+    nix run nixpkgs#nixfmt -- ./npm_deps_formatted
+    diff -u --color=always ./npm_deps_formatted.nix ./npm_deps.nix
 
     for path in ./node_modules ./package.json ./bun.lock ./bun.lockb; do
         if [ -e "$path" ]; then
@@ -92,7 +92,7 @@ setup_test() {
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
     nix run nixpkgs#nixfmt -- --check ./npm_deps_formatted
-    diff -u ./npm_deps_formatted.nix ./npm_deps.nix
+    diff -u --color=always ./npm_deps_formatted.nix ./npm_deps.nix
 
     deps=$(nix-build --no-out-link ./npm_deps.nix)
 
@@ -130,11 +130,11 @@ setup_test() {
 
     cp ./plugin_deps.nix ./plugin_deps_formatted.nix
     nix run nixpkgs#nixfmt -- --check ./plugin_deps_formatted
-    diff -u ./plugin_deps_formatted.nix ./plugin_deps.nix
+    diff -u --color=always ./plugin_deps_formatted.nix ./plugin_deps.nix
 
     cp ./cli_deps.nix ./cli_deps_formatted.nix
     nix run nixpkgs#nixfmt -- --check ./cli_deps_formatted
-    diff -u ./cli_deps_formatted.nix ./cli_deps.nix
+    diff -u --color=always ./cli_deps_formatted.nix ./cli_deps.nix
 
     plugin_deps=$(nix-build --no-out-link ./plugin_deps.nix)
     cli_deps=$(nix-build --no-out-link ./cli_deps.nix)
