@@ -36,7 +36,7 @@ if (arg.positionals.length > 0) {
 const bunLockJson = fs.readFileSync(`${cwd}/bun.lock`, "utf-8").replace(/,(\s*[}\]])/g, "$1");
 const bunLock = JSON.parse(bunLockJson);
 
-const pkgInfos = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
+const packages = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
   const modulePaths = [];
   let baseName;
   let iterName = name;
@@ -54,7 +54,7 @@ const pkgInfos = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
   return { baseName, modulePath, lockInfo };
 });
 
-const fetchTextLines = pkgInfos.flatMap(({ baseName, modulePath, lockInfo }) => {
+const fetchTextLines = packages.flatMap(({ baseName, modulePath, lockInfo }) => {
   const nameUrl = lockInfo[0];
   const hash = lockInfo[3];
 
@@ -94,7 +94,7 @@ const fetchTextLines = pkgInfos.flatMap(({ baseName, modulePath, lockInfo }) => 
   }
 });
 
-const binTextLines = pkgInfos.flatMap(({ lockInfo, modulePath }) => {
+const binTextLines = packages.flatMap(({ lockInfo, modulePath }) => {
   const bin = lockInfo[2].bin;
   return bin
     ? Object.entries(bin).flatMap(([binName, binPath]) => [
