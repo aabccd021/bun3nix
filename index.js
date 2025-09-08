@@ -1,11 +1,11 @@
 #!/usr/bin/env bun
 
+// TODO test tailwind and plugin
+// TODO test tailwind and separated plugin
 // TODO rename pkg to lockInfo
 // TODO remove unused val1 and val2, and instead use index access
 // TODO don't use val0, val1, val2, val3 if possible
 // TODO don't use module_path
-// TODO test tailwind and plugin
-// TODO test tailwind and separated plugin
 // TODO github workflow
 
 import * as child_process from "node:child_process";
@@ -112,6 +112,7 @@ const fetchTextPromises = pkgsInfos.map(fetchTextPromise);
 const fetchTexts = await Promise.all(fetchTextPromises);
 const fetchText = fetchTexts
   .flat()
+  // TODO is this required ?
   .filter((line) => line !== undefined)
   .map((line) => `    ${line}`)
   .join("\n");
