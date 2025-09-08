@@ -11,42 +11,41 @@ import * as path from "node:path";
 import * as util from "node:util";
 
 function mkFetchText({ cwd, lockInfo, name, baseName, modulePath }) {
-  const [val0, _val1, _val2, val3] = lockInfo;
+  const nameUrl = lockInfo[0];
+  const hash = lockInfo[3];
 
-  // git dependencies
-  if (!lockInfo[3]) {
-    const url = new URL(
-      lockInfo[0].replace(`${name}@`, "").replace("github:", "https://github.com/"),
-    );
-    const bunTag = fs.readFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, "utf-8");
-    try {
-      fs.rmSync(`${cwd}/node_modules/${modulePath}/.bun-tag`);
-      const hash = child_process.execSync(
-        `nix-hash --base64 --type sha512 --sri ${cwd}/node_modules/${modulePath}`,
-        { encoding: "utf-8" },
-      );
-      return [
-        `"${modulePath}" = pkgs.fetchgit {`,
-        `  url = "${url.origin}${url.pathname}";`,
-        `  rev = "${url.hash.substring(1)}";`,
-        `  hash = "${hash.trim()}";`,
-        `};`,
-      ];
-    } finally {
-      fs.writeFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, bunTag);
-    }
+  if (hash) {
+    // npm dependencies
+    const tarballName = path.basename(val0).replaceAll("@", "-");
+    return [
+      `"${modulePath}" = extractTarball (`,
+      `  pkgs.fetchurl {`,
+      `    url = "https://registry.npmjs.org/${baseName}/-/${tarballName}.tgz";`,
+      `    hash = "${hash}";`,
+      `  }`,
+      `);`,
+    ];
   }
 
-  // npm dependencies
-  const tarballName = path.basename(val0).replaceAll("@", "-");
-  return [
-    `"${modulePath}" = extractTarball (`,
-    `  pkgs.fetchurl {`,
-    `    url = "https://registry.npmjs.org/${baseName}/-/${tarballName}.tgz";`,
-    `    hash = "${val3}";`,
-    `  }`,
-    `);`,
-  ];
+  // git dependencies
+  const url = new URL(nameUrl.replace(`${name}@`, "").replace("github:", "https://github.com/"));
+  const bunTag = fs.readFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, "utf-8");
+  try {
+    fs.rmSync(`${cwd}/node_modules/${modulePath}/.bun-tag`);
+    const hash = child_process.execSync(
+      `nix-hash --base64 --type sha512 --sri ${cwd}/node_modules/${modulePath}`,
+      { encoding: "utf-8" },
+    );
+    return [
+      `"${modulePath}" = pkgs.fetchgit {`,
+      `  url = "${url.origin}${url.pathname}";`,
+      `  rev = "${url.hash.substring(1)}";`,
+      `  hash = "${hash.trim()}";`,
+      `};`,
+    ];
+  } finally {
+    fs.writeFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, bunTag);
+  }
 }
 
 const arg = util.parseArgs({
