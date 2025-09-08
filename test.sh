@@ -41,7 +41,7 @@ fi
     cd_random_dir
 
     "$index_js" "github:lodash/lodash#8a26eb4" "@types/bun@1.2.21" "is-even@1.0.0" >./node_modules.nix
-    rm -rf ./node_modules
+    if [ -d ./node_modules ]; then exit 1; fi
     cp -Lr "$(nix-build --no-out-link ./node_modules.nix)/lib/node_modules" ./node_modules
     chmod -R u+rwX ./node_modules
 
