@@ -1,9 +1,5 @@
 #!/usr/bin/env bun
 
-// TODO rename pkg to lockInfo
-// TODO remove unused val1 and val2, and instead use index access
-// TODO don't use val0, val1, val2, val3 if possible
-
 import * as child_process from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
@@ -16,7 +12,7 @@ function mkFetchText({ cwd, lockInfo, name, baseName, modulePath }) {
 
   if (hash) {
     // npm dependencies
-    const tarballName = path.basename(val0).replaceAll("@", "-");
+    const tarballName = path.basename(nameUrl).replaceAll("@", "-");
     return [
       `"${modulePath}" = extractTarball (`,
       `  pkgs.fetchurl {`,
