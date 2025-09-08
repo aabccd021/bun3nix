@@ -117,7 +117,7 @@ const binText = pkgInfos
   .join("\n");
 
 console.log(`{ 
-  pkgs ? import <nixpkgs> {},
+  pkgs ? import <nixpkgs> { },
   ...
 }:
 let
@@ -142,10 +142,10 @@ ${fetchText}
     (lib.concatStringsSep "\\n")
   ];
 in
-(pkgs.runCommand "node_modules" 
+(pkgs.runCommand "node_modules"
   {
     buildInputs = [ pkgs.nodejs ];
-  } 
+  }
   ''
     \${packageCommands}
     mkdir -p "$out/lib/node_modules/.bin"
