@@ -34,7 +34,8 @@ if (arg.positionals.length > 0) {
   child_process.execSync(`bun add ${arg.positionals.join(" ")}`, { cwd });
 }
 
-const bunLockJson = fs.readFileSync(`${cwd}/bun.lock`, "utf-8").replace(/,(\s*[}\]])/g, "$1");
+const bunLockJsonC = fs.readFileSync(`${cwd}/bun.lock`, "utf-8");
+const bunLockJson = bunLockJsonC.replace(/,(\s*[}\]])/g, "$1");
 const bunLock = JSON.parse(bunLockJson);
 
 const packages = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
@@ -60,7 +61,6 @@ const fetchTextLines = packages.flatMap(({ baseName, modulePath, lockInfo }) => 
   const hash = lockInfo[3];
 
   if (hash) {
-    // npm dependencies
     const tarballName = path.basename(nameUrl).replaceAll("@", "-");
     return [
       `"${modulePath}" = extractTarball (`,
@@ -72,10 +72,8 @@ const fetchTextLines = packages.flatMap(({ baseName, modulePath, lockInfo }) => 
     ];
   }
 
-  // git dependencies
-  const url = new URL(
-    nameUrl.substring(nameUrl.lastIndexOf("@") + 1).replace("github:", "https://github.com/"),
-  );
+  const identifier = nameUrl.substring(nameUrl.lastIndexOf("@") + 1);
+  const url = new URL(identifier.replace("github:", "https://github.com/"));
   const bunTag = fs.readFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, "utf-8");
   try {
     fs.rmSync(`${cwd}/node_modules/${modulePath}/.bun-tag`);
