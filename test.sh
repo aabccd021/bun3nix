@@ -6,17 +6,17 @@ cp "$(git rev-parse --show-toplevel)/index.js" "$tmpdir/bun2node_modules"
 PATH="$tmpdir:$PATH"
 export PATH
 
-setup_test() {
-    tmpdir=$(mktemp -d)
-    trap 'rm -rf $tmpdir' EXIT
-    cd "$tmpdir" || exit 1
-}
-
 if ! command -v bun >/dev/null 2>&1; then
     bun_pkg=$(nix build nixpkgs#bun --no-link --print-out-paths)
     PATH="$bun_pkg/bin:$PATH"
     export PATH
 fi
+
+setup_test() {
+    tmpdir=$(mktemp -d)
+    trap 'rm -rf $tmpdir' EXIT
+    cd "$tmpdir" || exit 1
+}
 
 (
     echo "# --postinstall"
