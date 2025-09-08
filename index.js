@@ -44,7 +44,7 @@ const depsMap = Object.fromEntries(
       .filter((n) => name.startsWith(`${n}/`) && n !== name)
       .sort((a, b) => b.length - a.length)
       .at(0);
-    const baseName = parentName !== undefined ? name.substring(parentName.length + 1) : name;
+    const baseName = parentName ? name.substring(parentName.length + 1) : name;
     return [name, { parentName, baseName }];
   }),
 );
@@ -53,7 +53,7 @@ const pkgInfos = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
   const modulePaths = [];
   let current = depsMap[name];
   const baseName = current.baseName;
-  while (current !== undefined) {
+  while (current) {
     modulePaths.push(current.baseName);
     current = depsMap[current.parentName];
   }
