@@ -122,13 +122,15 @@ const binText = pkgsInfos
     if (val2?.bin === undefined) {
       return undefined;
     }
-    for (const [binName, binPath] of Object.entries(val2.bin)) {
-      return `    cp "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`;
-    }
+    return Object.entries(val2.bin)
+      .map(
+        ([binName, binPath]) =>
+          `    cp "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
+      )
+      .join("\n");
   })
   .filter((line) => line !== undefined)
   .join("\n");
-
 
 console.log(`{ pkgs ? import <nixpkgs> {}, ... }:
 let

@@ -1,0 +1,13 @@
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - run: nix run nixpkgs#prettier -- README.md .github --print-width 100 --check
+      - run: nix run nixpkgs#shfmt -- --posix --indent 4 --diff .
+      - run: nix run nixpkgs#shellcheck -- -s sh test.sh
+      - run: nix shell nixpkgs#sqlite --command test.sh
