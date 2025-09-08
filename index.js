@@ -3,8 +3,6 @@
 // TODO rename pkg to lockInfo
 // TODO remove unused val1 and val2, and instead use index access
 // TODO don't use val0, val1, val2, val3 if possible
-// TODO don't use module_path
-// TODO --output
 
 import * as child_process from "node:child_process";
 import * as fs from "node:fs";
@@ -12,8 +10,8 @@ import * as os from "node:os";
 import * as path from "node:path";
 import * as util from "node:util";
 
-function mkFetchText({ cwd, pkg, name, baseName, modulePath }) {
-  const [val0, _val1, _val2, val3] = pkg;
+function mkFetchText({ cwd, lockInfo, name, baseName, modulePath }) {
+  const [val0, _val1, _val2, val3] = lockInfo;
 
   // git dependencies
   if (val3 === undefined) {
@@ -82,17 +80,17 @@ const bunLockJson = bunLockJsonc.replace(/,(\s*[}\]])/g, "$1");
 const bunLock = JSON.parse(bunLockJson);
 
 const dependencyMap = Object.fromEntries(
-  Object.entries(bunLock.packages).map(([name, pkg]) => {
+  Object.entries(bunLock.packages).map(([name, lockInfo]) => {
     const parentName = Object.keys(bunLock.packages)
       .filter((n) => name.startsWith(`${n}/`) && n !== name)
       .sort((a, b) => b.length - a.length)
       .at(0);
     const baseName = parentName !== undefined ? name.substring(parentName.length + 1) : name;
-    return [name, { parentName, baseName, pkg }];
+    return [name, { parentName, baseName, lockInfo }];
   }),
 );
 
-const pkgsInfos = Object.entries(dependencyMap).map(([name, { baseName, pkg }]) => {
+const pkgsInfos = Object.entries(dependencyMap).map(([name, { baseName, lockInfo }]) => {
   const modulePaths = [];
   let current = dependencyMap[name];
   while (current !== undefined) {
@@ -100,7 +98,7 @@ const pkgsInfos = Object.entries(dependencyMap).map(([name, { baseName, pkg }]) 
     current = dependencyMap[current.parentName];
   }
   const modulePath = modulePaths.reverse().join("/node_modules/");
-  return { pkg, name, baseName, modulePath };
+  return { name, baseName, modulePath, lockInfo };
 });
 
 const fetchText = pkgsInfos
@@ -109,8 +107,8 @@ const fetchText = pkgsInfos
   .join("\n");
 
 const binText = pkgsInfos
-  .flatMap(({ pkg, modulePath }) => {
-    const [_val0, _val1, val2, _val3] = pkg;
+  .flatMap(({ lockInfo, modulePath }) => {
+    const [_val0, _val1, val2, _val3] = lockInfo;
     if (!val2.bin) {
       return [];
     }
