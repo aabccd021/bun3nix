@@ -40,19 +40,17 @@ const bunLock = JSON.parse(bunLockJson);
 
 const pkgInfos = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
   const modulePaths = [];
-  let currentName = name;
   let baseName;
-  while (currentName) {
-    const currentParentName = Object.keys(bunLock.packages)
-      .filter((n) => currentName.startsWith(`${n}/`) && n !== currentName)
+  let iterName = name;
+  while (iterName) {
+    const depName = Object.keys(bunLock.packages)
+      .filter((n) => iterName.startsWith(`${n}/`) && n !== iterName)
       .sort((a, b) => b.length - a.length)
       .at(0);
-    const currentBaseName = currentParentName
-      ? currentName.substring(currentParentName.length + 1)
-      : currentName;
-    modulePaths.push(currentBaseName);
-    baseName = baseName ?? currentBaseName;
-    currentName = currentParentName;
+    const iterBaseName = depName ? iterName.substring(depName.length + 1) : iterName;
+    modulePaths.push(iterBaseName);
+    baseName = baseName ?? iterBaseName;
+    iterName = depName;
   }
   const modulePath = modulePaths.reverse().join("/node_modules/");
   return { baseName, modulePath, lockInfo };
