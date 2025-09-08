@@ -100,9 +100,9 @@ const fetchTextLines = packages.flatMap(({ baseName, modulePath, lockInfo }) => 
 });
 
 const binTextLines = packages.flatMap(({ lockInfo, modulePath }) => {
-  const bin = lockInfo[2].bin;
-  return bin
-    ? Object.entries(bin).flatMap(([binName, binPath]) => [
+  const bins = lockInfo[2].bin;
+  return bins
+    ? Object.entries(bins).flatMap(([binName, binPath]) => [
         `patchShebangs --host "$out/lib/node_modules/${modulePath}/${binPath}"`,
         `ln -s "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
       ])
