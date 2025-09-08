@@ -14,8 +14,10 @@ function mkFetchText({ cwd, lockInfo, name, baseName, modulePath }) {
   const [val0, _val1, _val2, val3] = lockInfo;
 
   // git dependencies
-  if (val3 === undefined) {
-    const url = new URL(val0.replace(`${name}@`, "").replace("github:", "https://github.com/"));
+  if (!lockInfo[3]) {
+    const url = new URL(
+      lockInfo[0].replace(`${name}@`, "").replace("github:", "https://github.com/"),
+    );
     const bunTag = fs.readFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, "utf-8");
     try {
       fs.rmSync(`${cwd}/node_modules/${modulePath}/.bun-tag`);
