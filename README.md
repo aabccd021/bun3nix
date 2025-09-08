@@ -1,4 +1,4 @@
-# :snowflake: bun3nix
+# :hamburger: bun3nix :snowflake:
 
 Generate `node_modules.nix` from `bun.lock`.
 
