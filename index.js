@@ -57,7 +57,7 @@ const pkgInfos = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
 });
 
 const fetchText = pkgInfos
-  .flatMap(({ lockInfo, baseName, modulePath }) => {
+  .flatMap(({ baseName, modulePath, lockInfo }) => {
     const nameUrl = lockInfo[0];
     const hash = lockInfo[3];
 
