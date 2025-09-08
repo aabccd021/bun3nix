@@ -117,19 +117,16 @@ const fetchText = fetchTexts
   .join("\n");
 
 const binText = pkgsInfos
-  .map(({ pkg, modulePath }) => {
+  .flatMap(({ pkg, modulePath }) => {
     const [_val0, _val1, val2, _val3] = pkg;
     if (val2?.bin === undefined) {
-      return undefined;
+      return [];
     }
-    return Object.entries(val2.bin)
-      .map(
-        ([binName, binPath]) =>
-          `    cp "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
-      )
-      .join("\n");
+    return Object.entries(val2.bin).map(
+      ([binName, binPath]) =>
+        `    cp "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
+    );
   })
-  .filter((line) => line !== undefined)
   .join("\n");
 
 console.log(`{ pkgs ? import <nixpkgs> {}, ... }:
