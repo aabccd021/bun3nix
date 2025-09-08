@@ -40,13 +40,7 @@ fi
     trap 'rm -rf $tmpdir' EXIT
     cd "$tmpdir" || exit 1
 
-    # --package lodash@github:lodash/lodash#8a26eb4 \
-    "$index_js" \
-        --package "github:lodash/lodash#8a26eb4" \
-        --package "@types/bun@1.2.21" \
-        --package "is-even@1.0.0" \
-        >./node_modules.nix
-    # cat ./node_modules.nix
+    "$index_js" "github:lodash/lodash#8a26eb4" "@types/bun@1.2.21" "is-even@1.0.0" >./node_modules.nix
     rm -rf ./node_modules
     cp -Lr "$(nix-build --no-out-link ./node_modules.nix)" ./node_modules
     chmod -R u+rwX ./node_modules

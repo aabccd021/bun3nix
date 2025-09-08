@@ -49,23 +49,25 @@ const arg = util.parseArgs({
       type: "boolean",
       default: false,
     },
-    package: {
-      type: "string",
-      multiple: true,
-      default: [],
-    }
   },
+  allowPositionals: true,
   strict: true,
 });
 
-if (arg.values.postinstall === false && arg.values.package.length === 0) {
+if (arg.values.postinstall === false && arg.positionals.length === 0) {
+  console.error("Either --postinstall or package names must be provided");
+  process.exit(1);
+}
+
+if (arg.values.postinstall && arg.positionals.length > 0) {
+  console.error("Cannot provide both --postinstall and package names");
   process.exit(1);
 }
 
 let cwd = process.cwd();
-if (arg.values.package.length > 0) {
+if (arg.positionals.length > 0) {
   cwd = await fs.mkdtemp(path.join(os.tmpdir(), "bun-nix-"));
-  child_process.execSync(`bun add ${arg.values.package.join(" ")}`, { cwd });
+  child_process.execSync(`bun add ${arg.positionals.join(" ")}`, { cwd });
 }
 
 const bunLockJsonc = await Bun.file(`${cwd}/bun.lock`).text();
