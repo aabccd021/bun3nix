@@ -145,4 +145,5 @@ in
   mkdir -p "$out/lib/node_modules/.bin"
 ${binText}
   ln -s "$out/lib/node_modules/.bin" "$out/bin"
-'')`);
+  ''
+)`);
