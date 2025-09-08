@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -eu
-set -x
 
 index_js="$(git rev-parse --show-toplevel)/index.js"
 
