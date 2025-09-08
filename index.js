@@ -116,7 +116,10 @@ const binText = pkgInfos
   .map((line) => `    ${line}`)
   .join("\n");
 
-console.log(`{ pkgs ? import <nixpkgs> {}, ... }:
+console.log(`{ 
+  pkgs ? import <nixpkgs> {},
+  ...
+}:
 let
   lib = pkgs.lib;
   extractTarball =
@@ -139,12 +142,14 @@ ${fetchText}
     (lib.concatStringsSep "\\n")
   ];
 in
-  (pkgs.runCommand "node_modules" {
+(pkgs.runCommand "node_modules" 
+  {
     buildInputs = [ pkgs.nodejs ];
-  } ''
+  } 
+  ''
     \${packageCommands}
     mkdir -p "$out/lib/node_modules/.bin"
 ${binText}
     ln -s "$out/lib/node_modules/.bin" "$out/bin"
-  '')
-`);
+  ''
+)`);
