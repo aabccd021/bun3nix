@@ -54,61 +54,55 @@ const pkgInfos = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
   return { baseName, modulePath, lockInfo };
 });
 
-const fetchText = pkgInfos
-  .flatMap(({ baseName, modulePath, lockInfo }) => {
-    const nameUrl = lockInfo[0];
-    const hash = lockInfo[3];
+const fetchTextLines = pkgInfos.flatMap(({ baseName, modulePath, lockInfo }) => {
+  const nameUrl = lockInfo[0];
+  const hash = lockInfo[3];
 
-    if (hash) {
-      // npm dependencies
-      const tarballName = path.basename(nameUrl).replaceAll("@", "-");
-      return [
-        `"${modulePath}" = extractTarball (`,
-        `  pkgs.fetchurl {`,
-        `    url = "https://registry.npmjs.org/${baseName}/-/${tarballName}.tgz";`,
-        `    hash = "${hash}";`,
-        `  }`,
-        `);`,
-      ];
-    }
+  if (hash) {
+    // npm dependencies
+    const tarballName = path.basename(nameUrl).replaceAll("@", "-");
+    return [
+      `"${modulePath}" = extractTarball (`,
+      `  pkgs.fetchurl {`,
+      `    url = "https://registry.npmjs.org/${baseName}/-/${tarballName}.tgz";`,
+      `    hash = "${hash}";`,
+      `  }`,
+      `);`,
+    ];
+  }
 
-    // git dependencies
-    const url = new URL(
-      nameUrl.substring(nameUrl.lastIndexOf("@") + 1).replace("github:", "https://github.com/"),
+  // git dependencies
+  const url = new URL(
+    nameUrl.substring(nameUrl.lastIndexOf("@") + 1).replace("github:", "https://github.com/"),
+  );
+  const bunTag = fs.readFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, "utf-8");
+  try {
+    fs.rmSync(`${cwd}/node_modules/${modulePath}/.bun-tag`);
+    const hash = child_process.execSync(
+      `nix-hash --base64 --type sha512 --sri ${cwd}/node_modules/${modulePath}`,
+      { encoding: "utf-8" },
     );
-    const bunTag = fs.readFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, "utf-8");
-    try {
-      fs.rmSync(`${cwd}/node_modules/${modulePath}/.bun-tag`);
-      const hash = child_process.execSync(
-        `nix-hash --base64 --type sha512 --sri ${cwd}/node_modules/${modulePath}`,
-        { encoding: "utf-8" },
-      );
-      return [
-        `"${modulePath}" = pkgs.fetchgit {`,
-        `  url = "${url.origin}${url.pathname}";`,
-        `  rev = "${url.hash.substring(1)}";`,
-        `  hash = "${hash.trim()}";`,
-        `};`,
-      ];
-    } finally {
-      fs.writeFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, bunTag);
-    }
-  })
-  .map((line) => `    ${line}`)
-  .join("\n");
+    return [
+      `"${modulePath}" = pkgs.fetchgit {`,
+      `  url = "${url.origin}${url.pathname}";`,
+      `  rev = "${url.hash.substring(1)}";`,
+      `  hash = "${hash.trim()}";`,
+      `};`,
+    ];
+  } finally {
+    fs.writeFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, bunTag);
+  }
+});
 
-const binText = pkgInfos
-  .flatMap(({ lockInfo, modulePath }) => {
-    const bin = lockInfo[2].bin;
-    return bin
-      ? Object.entries(bin).flatMap(([binName, binPath]) => [
-          `patchShebangs --host "$out/lib/node_modules/${modulePath}/${binPath}"`,
-          `ln -s "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
-        ])
-      : [];
-  })
-  .map((line) => `  ${line}`)
-  .join("\n");
+const binTextLines = pkgInfos.flatMap(({ lockInfo, modulePath }) => {
+  const bin = lockInfo[2].bin;
+  return bin
+    ? Object.entries(bin).flatMap(([binName, binPath]) => [
+        `patchShebangs --host "$out/lib/node_modules/${modulePath}/${binPath}"`,
+        `ln -s "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
+      ])
+    : [];
+});
 
 console.log(`{
   pkgs ? import <nixpkgs> { },
@@ -123,7 +117,7 @@ let
       \${pkgs.libarchive}/bin/bsdtar -xf \${src} --strip-components 1 -C "$out"
     '';
   packages = {
-${fetchText}
+${fetchTextLines.map((line) => `    ${line}`).join("\n")}
   };
   packageCommands = lib.pipe packages [
     (lib.mapAttrsToList (
@@ -139,6 +133,6 @@ in
 (pkgs.runCommand "node_modules" { buildInputs = [ pkgs.nodejs ]; } ''
   \${packageCommands}
   mkdir -p "$out/lib/node_modules/.bin"
-${binText}
+${binTextLines.map((line) => `  ${line}`).join("\n")}
   ln -s "$out/lib/node_modules/.bin" "$out/bin"
 '')`);
