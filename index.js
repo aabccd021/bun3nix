@@ -109,11 +109,12 @@ const fetchText = pkgsInfos
 const binText = pkgsInfos
   .flatMap(({ lockInfo, modulePath }) => {
     const bin = lockInfo[2].bin;
-    if (!bin) return [];
-    return Object.entries(bin).flatMap(([binName, binPath]) => [
-      `patchShebangs --host "$out/lib/node_modules/${modulePath}/${binPath}"`,
-      `ln -s "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
-    ]);
+    return bin
+      ? Object.entries(bin).flatMap(([binName, binPath]) => [
+          `patchShebangs --host "$out/lib/node_modules/${modulePath}/${binPath}"`,
+          `ln -s "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
+        ])
+      : [];
   })
   .map((line) => `    ${line}`)
   .join("\n");
