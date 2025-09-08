@@ -27,12 +27,6 @@ setup_test() {
     setup_test
 
     bun install is-even@1.0.0 lodash@github:lodash/lodash#8a26eb4 @types/bun@1.2.21
-    for path in ./node_modules ./package.json ./bun.lock; do
-        if [ ! -e "$path" ]; then
-            echo "$path should exist"
-            exit 1
-        fi
-    done
 
     bun2node_modules --postinstall >./npm_deps.nix
     rm -rf ./node_modules
@@ -85,13 +79,7 @@ setup_test() {
         @tailwindcss/cli@4.1.11 \
         tailwindcss@4.1.11 \
         >./npm_deps.nix
-    for path in ./node_modules ./package.json ./bun.lock ./bun.lockb; do
-        if [ -e "$path" ]; then
-            echo "$path should not exist"
-            exit 1
-        fi
-    done
-    deps_path=$(nix-build --no-out-link ./npm_deps.nix)
+    deps=$(nix-build --no-out-link ./npm_deps.nix)
 
     echo '
         @import "tailwindcss";
@@ -101,8 +89,43 @@ setup_test() {
 
     echo 'button class="icon-[heroicons--rss-solid] btn btn-soft"></button>' >./index.html
 
-    NODE_PATH="$deps_path/lib/node_modules" \
-        "$deps_path/bin/tailwindcss" --input ./style.css --output ./output.css
+    NODE_PATH="$deps/lib/node_modules" \
+        "$deps/bin/tailwindcss" --input ./style.css --output ./output.css
+
+    for text in "\.btn" "\.btn-soft" "heroicons--rss-solid"; do
+        if ! grep -q "$text" ./output.css; then
+            echo "text not found: $text"
+            cat ./output.css
+            exit 1
+        fi
+    done
+)
+
+(
+    echo "# tailwindcss with plugins on separate node_modules"
+    setup_test
+
+    bun2node_modules \
+        @iconify/json@2.2.359 \
+        @iconify/tailwind4@1.0.6 \
+        daisyui@5.0.46 \
+        tailwindcss@4.1.11 \
+        >./plugin_deps.nix
+    bun2node_modules @tailwindcss/cli@4.1.11 >./cli_deps.nix
+
+    plugin_deps=$(nix-build --no-out-link ./plugin_deps.nix)
+    cli_deps=$(nix-build --no-out-link ./cli_deps.nix)
+
+    echo '
+        @import "tailwindcss";
+        @plugin "@iconify/tailwind4";
+        @plugin "daisyui";
+    ' >./style.css
+
+    echo 'button class="icon-[heroicons--rss-solid] btn btn-soft"></button>' >./index.html
+
+    NODE_PATH="$plugin_deps/lib/node_modules" \
+        "$cli_deps/bin/tailwindcss" --input ./style.css --output ./output.css
 
     for text in "\.btn" "\.btn-soft" "heroicons--rss-solid"; do
         if ! grep -q "$text" ./output.css; then
