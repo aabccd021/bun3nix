@@ -3,7 +3,6 @@
 import * as child_process from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
-import * as path from "node:path";
 import * as util from "node:util";
 
 const arg = util.parseArgs({
@@ -30,12 +29,11 @@ if (arg.values.postinstall && arg.positionals.length > 0) {
 
 let cwd = process.cwd();
 if (arg.positionals.length > 0) {
-  cwd = fs.mkdtempSync(path.join(os.tmpdir(), "bun2node_modules-"));
+  cwd = fs.mkdtempSync(`${os.tmpdir()}/bun2node_modules-`);
   child_process.execSync(`bun add ${arg.positionals.join(" ")}`, { cwd });
 }
 
-const bunLockJsonc = fs.readFileSync(path.join(cwd, "bun.lock"), "utf-8");
-const bunLockJson = bunLockJsonc.replace(/,(\s*[}\]])/g, "$1");
+const bunLockJson = fs.readFileSync(`${cwd}/bun.lock`, "utf-8").replace(/,(\s*[}\]])/g, "$1");
 const bunLock = JSON.parse(bunLockJson);
 
 const pkgInfos = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
