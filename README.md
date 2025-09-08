@@ -1,4 +1,4 @@
-# bun3nix
+# :snowflake: bun3nix
 
 Generate `node_modules.nix` from `bun.lock`.
 
