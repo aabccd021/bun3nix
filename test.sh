@@ -10,7 +10,8 @@ setup_test() {
 }
 
 if ! command -v bun >/dev/null 2>&1; then
-    PATH="$(nix build nixpkgs#bun --no-link --print-out-paths 2>/dev/null)/bin:$PATH"
+    bun_pkg=$(nix build nixpkgs#bun --no-link --print-out-paths)
+    PATH="$bun_pkg/bin:$PATH"
     export PATH
 fi
 
