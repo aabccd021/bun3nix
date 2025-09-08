@@ -39,7 +39,7 @@ Here is how I personally do it
     flake = false;
   };
 
-  outputs = inputs: 
+  outputs = inputs:
   let
     pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
   in

@@ -1,12 +1,20 @@
 #!/usr/bin/env bun
 
-import * as path from "node:path";
-import * as util from "node:util";
+// TODO rename pkg to lockInfo
+// TODO remove unused val1 and val2, and instead use index access
+// TODO don't use val0, val1, val2, val3 if possible
+// TODO don't use module_path
+// TODO test tailwind and plugin
+// TODO test tailwind and separated plugin
+// TODO github workflow
+
+import * as child_process from "node:child_process";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
-import * as child_process from "node:child_process";
+import * as path from "node:path";
+import * as util from "node:util";
 
-async function packageTextPromise({ cwd, pkg, name, baseName, modulePath }) {
+async function fetchTextPromise({ cwd, pkg, name, baseName, modulePath }) {
   const [val0, _val1, _val2, val3] = pkg;
 
   // git dependencies
@@ -16,7 +24,10 @@ async function packageTextPromise({ cwd, pkg, name, baseName, modulePath }) {
     const bunTag = await bunTagFile.text();
     try {
       await bunTagFile.delete();
-      const hash = child_process.execSync(`nix-hash --base64 --type sha512 --sri ${cwd}/node_modules/${modulePath}`, { encoding: "utf-8" });
+      const hash = child_process.execSync(
+        `nix-hash --base64 --type sha512 --sri ${cwd}/node_modules/${modulePath}`,
+        { encoding: "utf-8" },
+      );
       return [
         `"${modulePath}" = pkgs.fetchgit {`,
         `  url = "${url.origin}${url.pathname}";`,
@@ -39,33 +50,6 @@ async function packageTextPromise({ cwd, pkg, name, baseName, modulePath }) {
     `  }`,
     `);`,
   ];
-}
-
-function serialize(cwd, obj) {
-  let result;
-  const dependencyEntries = Object.entries(obj)
-    .map(([name, pkg]) => {
-      const parentName = Object.keys(obj)
-        .filter((n) => name.startsWith(`${n}/`) && n !== name)
-        .sort((a, b) => b.length - a.length)
-        .at(0);
-      const baseName = parentName !== undefined ? name.substring(parentName.length + 1) : name;
-      return [name, { parentName, baseName, pkg }]
-    })
-
-  const dependencyMap = Object.fromEntries(dependencyEntries)
-
-  return Object.entries(dependencyMap)
-    .map(([name, { baseName, pkg }]) => {
-      const modulePaths = []
-      let current = dependencyMap[name];
-      while (current !== undefined) {
-        modulePaths.push(current.baseName);
-        current = dependencyMap[current.parentName];
-      }
-      const modulePath = modulePaths.reverse().join("/node_modules/");
-      return packageTextPromise({ cwd, pkg, name, baseName, modulePath });
-    })
 }
 
 const arg = util.parseArgs({
@@ -99,13 +83,52 @@ if (arg.positionals.length > 0) {
 const bunLockJsonc = await Bun.file(`${cwd}/bun.lock`).text();
 const bunLockJson = bunLockJsonc.replace(/,(\s*[}\]])/g, "$1");
 const bunLock = JSON.parse(bunLockJson);
-const packageTextPromises = serialize(cwd, bunLock.packages);
-const packageTexts = await Promise.all(packageTextPromises);
-const packageText = packageTexts
+
+const dependencyEntries = Object.entries(bunLock.packages).map(([name, pkg]) => {
+  const parentName = Object.keys(bunLock.packages)
+    .filter((n) => name.startsWith(`${n}/`) && n !== name)
+    .sort((a, b) => b.length - a.length)
+    .at(0);
+  // TODO calculate baseName on bottom loop
+  const baseName = parentName !== undefined ? name.substring(parentName.length + 1) : name;
+  return [name, { parentName, baseName, pkg }];
+});
+
+// TODO: merge with entries
+const dependencyMap = Object.fromEntries(dependencyEntries);
+
+const pkgsInfos = Object.entries(dependencyMap).map(([name, { baseName, pkg }]) => {
+  const modulePaths = [];
+  let current = dependencyMap[name];
+  while (current !== undefined) {
+    modulePaths.push(current.baseName);
+    current = dependencyMap[current.parentName];
+  }
+  const modulePath = modulePaths.reverse().join("/node_modules/");
+  return { cwd, pkg, name, baseName, modulePath };
+});
+
+const fetchTextPromises = pkgsInfos.map(fetchTextPromise);
+const fetchTexts = await Promise.all(fetchTextPromises);
+const fetchText = fetchTexts
   .flat()
   .filter((line) => line !== undefined)
   .map((line) => `    ${line}`)
   .join("\n");
+
+const binText = pkgsInfos
+  .map(({ pkg, modulePath }) => {
+    const [_val0, _val1, val2, _val3] = pkg;
+    if (val2?.bin === undefined) {
+      return undefined;
+    }
+    for (const [binName, binPath] of Object.entries(val2.bin)) {
+      return `    cp "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`;
+    }
+  })
+  .filter((line) => line !== undefined)
+  .join("\n");
+
 
 console.log(`{ pkgs ? import <nixpkgs> {}, ... }:
 let
@@ -117,17 +140,26 @@ let
       \${pkgs.libarchive}/bin/bsdtar -xf \${src} --strip-components 1 -C "$out"
     '';
   packages = {
-${packageText}
+${fetchText}
   };
+  packageCommands = lib.pipe packages [
+    (lib.mapAttrsToList (
+      name: package: ''
+        mkdir -p "$out/lib/node_modules/\${name}"
+        cp -Lr \${package}/* "$out/lib/node_modules/\${name}"
+        chmod -R u+w "$out/lib/node_modules/\${name}"
+      ''
+    ))
+    (lib.concatStringsSep "\\n")
+  ];
 in
-lib.pipe packages [
-  (lib.mapAttrsToList (
-    name: package: ''
-      mkdir -p "$out/\${name}"
-      cp -Lr \${package}/* "$out/\${name}"
-      chmod -R u+w "$out/\${name}"
-    ''
-  ))
-  (lib.concatStringsSep "\\n")
-  (pkgs.runCommand "node_modules" { })
-]`);
+  (pkgs.runCommand "node_modules" {
+    buildInputs = [ pkgs.nodejs ];
+  } ''
+    \${packageCommands}
+    mkdir -p "$out/lib/node_modules/.bin"
+${binText}
+    patchShebangs --host "$out/lib/node_modules/.bin/"*
+    ln -s "$out/lib/node_modules/.bin" "$out/bin"
+  '')
+`);

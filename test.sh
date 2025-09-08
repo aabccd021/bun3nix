@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 set -eu
+set -x
 
 index_js="$(git rev-parse --show-toplevel)/index.js"
+
+cd_random_dir() {
+    tmpdir=$(mktemp -d)
+    trap 'rm -rf $tmpdir' EXIT
+    cd "$tmpdir" || exit 1
+}
 
 if ! command -v bun >/dev/null 2>&1; then
     PATH="$(nix build nixpkgs#bun --no-link --print-out-paths 2>/dev/null)/bin:$PATH"
@@ -10,16 +17,13 @@ fi
 
 (
     echo "# --postinstall"
-
-    tmpdir=$(mktemp -d)
-    trap 'rm -rf $tmpdir' EXIT
-    cd "$tmpdir" || exit 1
+    cd_random_dir
 
     bun install is-even@1.0.0 lodash@github:lodash/lodash#8a26eb4 @types/bun@1.2.21
 
     "$index_js" --postinstall >./node_modules.nix
     rm -rf ./node_modules
-    cp -Lr "$(nix-build --no-out-link ./node_modules.nix)" ./node_modules
+    cp -Lr "$(nix-build --no-out-link ./node_modules.nix)/lib/node_modules" ./node_modules
     chmod -R u+rwX ./node_modules
 
     {
@@ -35,14 +39,11 @@ fi
 
 (
     echo "# --package"
-
-    tmpdir=$(mktemp -d)
-    trap 'rm -rf $tmpdir' EXIT
-    cd "$tmpdir" || exit 1
+    cd_random_dir
 
     "$index_js" "github:lodash/lodash#8a26eb4" "@types/bun@1.2.21" "is-even@1.0.0" >./node_modules.nix
     rm -rf ./node_modules
-    cp -Lr "$(nix-build --no-out-link ./node_modules.nix)" ./node_modules
+    cp -Lr "$(nix-build --no-out-link ./node_modules.nix)/lib/node_modules" ./node_modules
     chmod -R u+rwX ./node_modules
 
     {
