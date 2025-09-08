@@ -111,7 +111,7 @@ const binText = pkgInfos
         ])
       : [];
   })
-  .map((line) => `    ${line}`)
+  .map((line) => `  ${line}`)
   .join("\n");
 
 console.log(`{
@@ -140,14 +140,10 @@ ${fetchText}
     (lib.concatStringsSep "\\n")
   ];
 in
-(pkgs.runCommand "node_modules"
-  {
-    buildInputs = [ pkgs.nodejs ];
-  }
-  ''
-    \${packageCommands}
-    mkdir -p "$out/lib/node_modules/.bin"
+(pkgs.runCommand "node_modules" { buildInputs = [ pkgs.nodejs ]; } ''
+  \${packageCommands}
+  mkdir -p "$out/lib/node_modules/.bin"
 ${binText}
-    ln -s "$out/lib/node_modules/.bin" "$out/bin"
+  ln -s "$out/lib/node_modules/.bin" "$out/bin"
   ''
 )`);

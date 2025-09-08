@@ -27,7 +27,6 @@ setup_test() {
     setup_test
 
     bun install is-even@1.0.0 lodash@github:lodash/lodash#8a26eb4 @types/bun@1.2.21
-
     bun2node_modules --postinstall >./npm_deps.nix
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
