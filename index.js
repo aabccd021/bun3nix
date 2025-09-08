@@ -82,36 +82,29 @@ const bunLockJson = bunLockJsonc.replace(/,(\s*[}\]])/g, "$1");
 const bunLock = JSON.parse(bunLockJson);
 
 const dependencyMap = Object.fromEntries(
-  Object.entries(bunLock.packages).map(([name, _pkg]) => {
+  Object.entries(bunLock.packages).map(([name, pkg]) => {
     const parentName = Object.keys(bunLock.packages)
       .filter((n) => name.startsWith(`${n}/`) && n !== name)
       .sort((a, b) => b.length - a.length)
       .at(0);
-    return [name, parentName];
+    const baseName = parentName !== undefined ? name.substring(parentName.length + 1) : name;
+    return [name, { parentName, baseName, pkg }];
   }),
 );
 
-const pkgsInfos = Object.entries(bunLock.packages).map(([thisName, pkg]) => {
-  const _thisParentName = dependencyMap[thisName];
-  const thisBaseName =
-    parentName !== undefined ? thisName.substring(parentName.length + 1) : thisName;
-
-  let name = thisName;
-  let baseName = thisBaseName;
+const pkgsInfos = Object.entries(dependencyMap).map(([name, { baseName, pkg }]) => {
   const modulePaths = [];
-  while (name !== undefined) {
-    name = parentName;
-    modulePaths.push(baseName);
-    parentName = dependencyMap[name];
-    baseName = parentName !== undefined ? parentName.substring(parentName.length + 1) : parentName;
+  let current = dependencyMap[name];
+  while (current !== undefined) {
+    modulePaths.push(current.baseName);
+    current = dependencyMap[current.parentName];
   }
-
   const modulePath = modulePaths.reverse().join("/node_modules/");
-  return { cwd, pkg, name, baseName, modulePath };
+  return { pkg, name, baseName, modulePath };
 });
 
 const fetchText = pkgsInfos
-  .flatMap(mkFetchText)
+  .flatMap((i) => mkFetchText({ ...i, cwd }))
   .filter((line) => line !== undefined)
   .map((line) => `    ${line}`)
   .join("\n");
