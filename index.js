@@ -1,4 +1,7 @@
+#!/usr/bin/env bun
+
 import * as path from "node:path";
+import * as util from "node:util";
 import { $ } from "bun";
 
 async function packageTextPromise([name, value]) {
@@ -35,6 +38,16 @@ async function packageTextPromise([name, value]) {
     `);`,
   ];
 }
+
+const { values: args } = util.parseArgs({
+  args: process.argv.slice(2),
+  options: {
+    postinstall: {
+      type: "boolean",
+    },
+  },
+  strict: true,
+});
 
 const bunLockJsonc = await Bun.file("bun.lock").text();
 const bunLockJson = bunLockJsonc.replace(/,(\s*[}\]])/g, "$1");
