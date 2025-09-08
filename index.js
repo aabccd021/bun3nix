@@ -38,24 +38,32 @@ const bunLockJsonc = fs.readFileSync(path.join(cwd, "bun.lock"), "utf-8");
 const bunLockJson = bunLockJsonc.replace(/,(\s*[}\]])/g, "$1");
 const bunLock = JSON.parse(bunLockJson);
 
-const depsMap = Object.fromEntries(
-  Object.keys(bunLock.packages).map((name) => {
-    const parentName = Object.keys(bunLock.packages)
-      .filter((n) => name.startsWith(`${n}/`) && n !== name)
-      .sort((a, b) => b.length - a.length)
-      .at(0);
-    const baseName = parentName ? name.substring(parentName.length + 1) : name;
-    return [name, { parentName, baseName }];
-  }),
-);
+// const depsMap = Object.fromEntries(
+//   Object.keys(bunLock.packages).map((name) => {
+//     const parentName = Object.keys(bunLock.packages)
+//       .filter((n) => name.startsWith(`${n}/`) && n !== name)
+//       .sort((a, b) => b.length - a.length)
+//       .at(0);
+//     const baseName = parentName ? name.substring(parentName.length + 1) : name;
+//     return [name, { parentName, baseName }];
+//   }),
+// );
 
 const pkgInfos = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
   const modulePaths = [];
-  let current = depsMap[name];
-  const baseName = current.baseName;
-  while (current) {
-    modulePaths.push(current.baseName);
-    current = depsMap[current.parentName];
+  let currentName = name;
+  let baseName;
+  while (currentName) {
+    const currentParentName = Object.keys(bunLock.packages)
+      .filter((n) => currentName.startsWith(`${n}/`) && n !== currentName)
+      .sort((a, b) => b.length - a.length)
+      .at(0);
+    const currentBaseName = currentParentName
+      ? currentName.substring(currentParentName.length + 1)
+      : currentName;
+    modulePaths.push(currentBaseName);
+    baseName = baseName ?? currentBaseName;
+    currentName = currentParentName;
   }
   const modulePath = modulePaths.reverse().join("/node_modules/");
   return { baseName, modulePath, lockInfo };
