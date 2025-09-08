@@ -24,9 +24,9 @@ fi
 
     bun install is-even@1.0.0 lodash@github:lodash/lodash#8a26eb4 @types/bun@1.2.21
 
-    bun2node_modules --postinstall >./node_modules.nix
+    bun2node_modules --postinstall >./npm_deps.nix
     rm -rf ./node_modules
-    cp -Lr "$(nix-build --no-out-link ./node_modules.nix)/lib/node_modules" ./node_modules
+    cp -Lr "$(nix-build --no-out-link ./npm_deps.nix)/lib/node_modules" ./node_modules
     chmod -R u+rwX ./node_modules
 
     echo '
@@ -43,14 +43,14 @@ fi
     echo "# packages as arguments"
     setup_test
 
-    bun2node_modules github:lodash/lodash#8a26eb4 @types/bun@1.2.21 is-even@1.0.0 >./node_modules.nix
+    bun2node_modules github:lodash/lodash#8a26eb4 @types/bun@1.2.21 is-even@1.0.0 >./npm_deps.nix
     for path in ./node_modules ./package.json ./bun.lock ./bun.lockb; do
         if [ -e "$path" ]; then
             echo "$path should not exist"
             exit 1
         fi
     done
-    cp -Lr "$(nix-build --no-out-link ./node_modules.nix)/lib/node_modules" ./node_modules
+    cp -Lr "$(nix-build --no-out-link ./npm_deps.nix)/lib/node_modules" ./node_modules
     chmod -R u+rwX ./node_modules
 
     echo '
