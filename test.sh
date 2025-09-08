@@ -3,7 +3,7 @@ set -eu
 
 index_js="$(git rev-parse --show-toplevel)/index.js"
 
-cd_random_dir() {
+setup_test() {
     tmpdir=$(mktemp -d)
     trap 'rm -rf $tmpdir' EXIT
     cd "$tmpdir" || exit 1
@@ -16,7 +16,7 @@ fi
 
 (
     echo "# --postinstall"
-    cd_random_dir
+    setup_test
 
     bun install is-even@1.0.0 lodash@github:lodash/lodash#8a26eb4 @types/bun@1.2.21
 
@@ -37,7 +37,7 @@ fi
 
 (
     echo "# packages as arguments"
-    cd_random_dir
+    setup_test
 
     "$index_js" "github:lodash/lodash#8a26eb4" "@types/bun@1.2.21" "is-even@1.0.0" >./node_modules.nix
     if [ -d ./node_modules ]; then exit 1; fi
