@@ -9,7 +9,7 @@ Add `postinstall` script to your `package.json`, then run `bun install`.
 ```json
 {
   "scripts": {
-    "postinstall": "curl -fsSL https://raw.githubusercontent.com/aabccd021/bun2node_modules/refs/heads/main/index.js | bun - > ./node_modules.nix"
+    "postinstall": "curl -fsSL https://raw.githubusercontent.com/aabccd021/bun2node_modules/refs/heads/main/index.js | bun - --postinstall > ./node_modules.nix"
   }
 }
 ```
