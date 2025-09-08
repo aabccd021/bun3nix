@@ -1,6 +1,6 @@
 # :snowflake: bun3nix
 
-Generate `node_modules.nix` from `bun.lock`.
+Generate `npm_deps.nix` from `bun.lock`.
 
 ## Usage
 
@@ -9,20 +9,20 @@ Add `postinstall` script to your `package.json`, then run `bun install`.
 ```json
 {
   "scripts": {
-    "postinstall": "curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js | bun - --postinstall > ./node_modules.nix"
+    "postinstall": "curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js | bun - --postinstall > ./npm_deps.nix"
   }
 }
 ```
 
-Use the generated `node_modules.nix` from your nix expression:
+Use the generated `npm_deps.nix` from your nix expression:
 
 ```nix
 { pkgs, ... }:
 {
-  node_modules = import ./node_modules.nix { inherit pkgs; };
+  npm_deps = import ./npm_deps.nix { inherit pkgs; };
 
   dependencyCount = pkgs.runCommand "count-deps" { } ''
-    count=$(ls ${node_modules} | wc -l)
+    count=$(ls ${npm_deps}/lib/node_modules | wc -l)
     echo "There are $count dependencies" > "$out"
   '';
 }
@@ -45,7 +45,7 @@ Here is how I personally do it
   in
   {
     packages.x86_64-linux.postinstall = pkgs.writeShellScriptBin "postinstall" ''
-      exec ${pkgs.bun}/bin/bun ${inputs.bun3nix} > ./node_modules.nix
+      exec ${pkgs.bun}/bin/bun ${inputs.bun3nix} > ./npm_deps.nix
     '';
   };
 }
