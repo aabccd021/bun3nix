@@ -108,11 +108,9 @@ const fetchText = pkgsInfos
 
 const binText = pkgsInfos
   .flatMap(({ lockInfo, modulePath }) => {
-    const [_val0, _val1, val2, _val3] = lockInfo;
-    if (!val2.bin) {
-      return [];
-    }
-    return Object.entries(val2.bin).flatMap(([binName, binPath]) => [
+    const bin = lockInfo[2].bin;
+    if (!bin) return [];
+    return Object.entries(bin).flatMap(([binName, binPath]) => [
       `patchShebangs --host "$out/lib/node_modules/${modulePath}/${binPath}"`,
       `ln -s "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
     ]);
