@@ -75,16 +75,16 @@ Contributions are welcome to add support for other sources!
 # All command below also works with `bun install` + `bun3nix postinstall`
 
 # npm dependencies
-nix run github:aabccd021/bun3nix install is-even
+bun install is-even
 
 # GitHub dependencies with `github:` prefix
-nix run github:aabccd021/bun3nix install github:lodash/lodash#8a26eb4
+bun github:lodash/lodash#8a26eb4
 
 # GitHub dependencies with full URL
-nix run github:aabccd021/bun3nix install https://github.com/lodash/lodash
+bun install https://github.com/lodash/lodash
 
 # GitHub dependencies with custom name
-nix run github:aabccd021/bun3nix install lorem@https://github.com/lodash/lodash
+bun install lorem@https://github.com/lodash/lodash
 ```
 
 ## LICENCE
