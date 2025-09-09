@@ -8,6 +8,15 @@
     let
       pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
 
+      forAllSystems =
+        function:
+        inputs.nixpkgs.lib.genAttrs [
+          "x86_64-linux"
+          "aarch64-linux"
+          "x86_64-darwin"
+          "aarch64-darwin"
+        ] (system: function inputs.nixpkgs.legacyPackages.${system});
+
       treefmtEval = inputs.treefmt-nix.lib.evalModule pkgs {
         programs.nixfmt.enable = true;
         programs.prettier.enable = true;
@@ -30,7 +39,9 @@
 
     in
     {
-      checks.x86_64-linux.formatting = treefmtEval.config.build.check self;
+      checks = forAllSystems (system: {
+        formatting = treefmtEval.config.build.check self;
+      });
       formatter.x86_64-linux = treefmtEval.config.build.wrapper;
     };
 }
