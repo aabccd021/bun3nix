@@ -142,6 +142,7 @@ nix run github:aabccd021/bun3nix install tailwindcss  @tailwindcss/cli > tailwin
       exec ${tailwindcss}/bin/tailwindcss "$@"
     '';
   };
+
 }
 ```
 
@@ -163,6 +164,7 @@ nix run github:aabccd021/bun3nix install @tailwindcss/cli tailwindcss daisyui > 
       exec ${tailwindcss_deps}/bin/tailwindcss "$@"
     '';
   };
+
 }
 ```
 
