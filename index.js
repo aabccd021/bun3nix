@@ -14,6 +14,7 @@ if (subcommand === "install") {
     process.exit(1);
   }
   cwd = fs.mkdtempSync(`${os.tmpdir()}/bun3nix-`);
+  process.on("exit", () => fs.rmSync(cwd, { recursive: true, force: true }));
   child_process.execSync(`bun add ${args.join(" ")}`, { cwd });
 } else if (subcommand !== "postinstall") {
   console.error(`Unknown subcommand: ${subcommand}`);
