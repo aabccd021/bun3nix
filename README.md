@@ -66,17 +66,17 @@ ls package.json # doesn't exist
 The `bun3nix` command is just a single JavaScript file that requires Bun to run.
 You can use one of the following methods to run it.
 
-### Oneliner
+### Download and pipe to Bun
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js | bun - install is-even > ./npm_deps.nix
+curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js | nix run nixpkgs#bun -- run - install is-even > ./npm_deps.nix
 ```
 
-### Download and run
+### Download and run with Bun
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js -o ./bun3nix.js
-bun ./bun3nix.js install is-even > ./npm_deps.nix
+nix run nixpkgs#bun ./bun3nix.js install is-even > ./npm_deps.nix
 ```
 
 ### Executable script, optionally installed globally
