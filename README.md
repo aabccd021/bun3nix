@@ -102,7 +102,7 @@ So ideally, you can use `bun3nix` to install Tailwind CSS plugins and run `tailw
 plugins:
 
 ```sh
-nix run github:aabccd021/bun3nix install tailwindcss daisyui > tailwindcss_plugins.nix
+nix run github:aabccd021/bun3nix install daisyui > tailwindcss_plugins.nix
 ```
 
 ```nix
