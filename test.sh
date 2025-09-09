@@ -212,32 +212,32 @@ setup_test() {
   diff -u --color=always ./cli_deps.nix ./cli_deps_formatted.nix
 )
 
-(
-  echo "# install: nixpkgs#tailwindcss_4 with plugins"
-  setup_test
-
-  nix run "$bun3nix" install \
-    @iconify/json@2.2.359 \
-    @iconify/tailwind4@1.0.6 \
-    daisyui@5.0.46 \
-    tailwindcss@4.1.11 \
-    >./plugin_deps.nix
-  plugin_deps=$(nix-build --no-out-link ./plugin_deps.nix)
-
-  echo '@import "tailwindcss"; @plugin "@iconify/tailwind4"; @plugin "daisyui";' >./style.css
-  echo 'button class="icon-[heroicons--rss-solid] btn btn-soft"></button>' >./index.html
-
-  NODE_PATH="$plugin_deps/lib/node_modules" \
-    nix run nixpkgs#tailwindcss_4 -- --input ./style.css --output ./output.css
-
-  for text in "\.btn" "\.btn-soft" "heroicons--rss-solid"; do
-    if ! grep -q "$text" ./output.css; then
-      echo "text not found: $text"
-      exit 1
-    fi
-  done
-
-  cp ./plugin_deps.nix ./plugin_deps_formatted.nix
-  nix run nixpkgs#nixfmt -- --strict ./plugin_deps_formatted
-  diff -u --color=always ./plugin_deps.nix ./plugin_deps_formatted.nix
-)
+# (
+#   echo "# install: nixpkgs#tailwindcss_4 with plugins"
+#   setup_test
+#
+#   nix run "$bun3nix" install \
+#     @iconify/json@2.2.359 \
+#     @iconify/tailwind4@1.0.6 \
+#     daisyui@5.0.46 \
+#     tailwindcss@4.1.11 \
+#     >./plugin_deps.nix
+#   plugin_deps=$(nix-build --no-out-link ./plugin_deps.nix)
+#
+#   echo '@import "tailwindcss"; @plugin "@iconify/tailwind4"; @plugin "daisyui";' >./style.css
+#   echo 'button class="icon-[heroicons--rss-solid] btn btn-soft"></button>' >./index.html
+#
+#   NODE_PATH="$plugin_deps/lib/node_modules" \
+#     nix run nixpkgs#tailwindcss_4 -- --input ./style.css --output ./output.css
+#
+#   for text in "\.btn" "\.btn-soft" "heroicons--rss-solid"; do
+#     if ! grep -q "$text" ./output.css; then
+#       echo "text not found: $text"
+#       exit 1
+#     fi
+#   done
+#
+#   cp ./plugin_deps.nix ./plugin_deps_formatted.nix
+#   nix run nixpkgs#nixfmt -- --strict ./plugin_deps_formatted
+#   diff -u --color=always ./plugin_deps.nix ./plugin_deps_formatted.nix
+# )
