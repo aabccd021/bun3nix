@@ -75,7 +75,7 @@ Contributions are welcome to add support for other sources!
 # All command below also works with `bun install` + `bun3nix postinstall`
 
 # npm dependencies
-bun install is-even
+bun install lodash
 
 # GitHub dependencies with `github:` prefix
 bun github:lodash/lodash#8a26eb4
