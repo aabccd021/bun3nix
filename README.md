@@ -115,7 +115,7 @@ chmod +x ./bun3nix
 Then run it with:
 
 ```sh
-nix run .#bun3nix -- install is-even > ./npm_deps.nix
+nix run .#bun3nix install is-even > ./npm_deps.nix
 ```
 
 ## Supported dependencies
