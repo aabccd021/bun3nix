@@ -25,13 +25,13 @@ setup_test() {
   chmod -R u+rwX ./node_modules
 
   echo '
-        import { strictEqual } from "node:assert";
-        import isEven from "is-even";
-        import _ from "lodash";
-        import { nanoid } from "nanoid";
-        strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
-        strictEqual(nanoid().length, 21);
-    ' >./test.ts
+    import { strictEqual } from "node:assert";
+    import isEven from "is-even";
+    import _ from "lodash";
+    import { nanoid } from "nanoid";
+    strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
+    strictEqual(nanoid().length, 21);
+  ' >./test.ts
   # use nodejs instead of bun because bun sometimes automatically download dependencies
   # even without package.json, bun.lock, or node_modules
   nix run nixpkgs#nodejs ./test.ts
@@ -58,15 +58,13 @@ setup_test() {
   chmod -R u+rwX ./node_modules
 
   echo '
-        import { strictEqual } from "node:assert";
-        import isEven from "is-even";
-        import _ from "lorem";
-        import { nanoid } from "ipsum";
-        strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
-        strictEqual(nanoid().length, 21);
-    ' >./test.ts
-  # use nodejs instead of bun because bun sometimes automatically download dependencies
-  # even without package.json, bun.lock, or node_modules
+    import { strictEqual } from "node:assert";
+    import isEven from "is-even";
+    import _ from "lorem";
+    import { nanoid } from "ipsum";
+    strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
+    strictEqual(nanoid().length, 21);
+  ' >./test.ts
   nix run nixpkgs#nodejs ./test.ts
   nix run nixpkgs#typescript -- --noEmit ./test.ts
 
@@ -95,13 +93,13 @@ setup_test() {
   chmod -R u+rwX ./node_modules
 
   echo '
-        import { strictEqual } from "node:assert";
-        import isEven from "is-even";
-        import _ from "lodash";
-        import { nanoid } from "nanoid";
-        strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
-        strictEqual(nanoid().length, 21);
-    ' >./test.ts
+    import { strictEqual } from "node:assert";
+    import isEven from "is-even";
+    import _ from "lodash";
+    import { nanoid } from "nanoid";
+    strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
+    strictEqual(nanoid().length, 21);
+  ' >./test.ts
   nix run nixpkgs#nodejs ./test.ts
   nix run nixpkgs#typescript -- --noEmit ./test.ts
 
@@ -130,13 +128,13 @@ setup_test() {
   chmod -R u+rwX ./node_modules
 
   echo '
-        import { strictEqual } from "node:assert";
-        import isEven from "is-even";
-        import _ from "lorem";
-        import { nanoid } from "ipsum";
-        strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
-        strictEqual(nanoid().length, 21);
-    ' >./test.ts
+    import { strictEqual } from "node:assert";
+    import isEven from "is-even";
+    import _ from "lorem";
+    import { nanoid } from "ipsum";
+    strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
+    strictEqual(nanoid().length, 21);
+  ' >./test.ts
   nix run nixpkgs#nodejs ./test.ts
   nix run nixpkgs#typescript -- --noEmit ./test.ts
 
