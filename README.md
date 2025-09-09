@@ -1,6 +1,6 @@
 # :snowflake: bun3nix
 
-Npm dependencies codegen using Bun.
+Generate Nix expressions from Bun dependencies.
 
 ## Usage
 
