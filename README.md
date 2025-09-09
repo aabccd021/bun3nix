@@ -37,7 +37,7 @@ Or import it in your own Nix expressions:
 
 Run this subcommand **after** running `bun install`.  
 This subcommand assumes `bun.lock` are present in the current directory.
-The `node_modules` should also be present if you use GitHub dependencies.
+The `node_modules` should also be present if you use github dependencies.
 
 ```sh
 nix run nixpkgs#bun install is-even @types/bun # generates package.json, bun.lock, and node_modules
@@ -70,7 +70,7 @@ ls package.json # doesn't exist
 
 ## Supported dependencies
 
-Currently, only npm and GitHub dependencies are supported.  
+Currently, only npm and github dependencies are supported.  
 Contributions are welcome to add support for other sources!
 
 ```sh
@@ -79,13 +79,13 @@ Contributions are welcome to add support for other sources!
 # npm dependencies
 bun install lodash
 
-# GitHub dependencies with `github:` prefix
+# github dependencies with `github:` prefix
 bun github:lodash/lodash#8a26eb4
 
-# GitHub dependencies with full URL
+# github dependencies with full URL
 bun install https://github.com/lodash/lodash
 
-# GitHub dependencies with custom name
+# github dependencies with custom name
 bun install lorem@https://github.com/lodash/lodash
 ```
 
