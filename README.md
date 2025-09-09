@@ -113,14 +113,19 @@ Currently, only **npm** and **GitHub** dependencies are supported.
 Contributions are welcome to add support for other sources!
 
 ```sh
+# All command below also works with `bun install` + `bun3nix postinstall`
+
 # npm dependencies
-bun install is-even
+bun3nix install is-even
 
 # GitHub dependencies with `github:` prefix
-bun install lodash@github:lodash/lodash#8a26eb4
+bun3nix install github:lodash/lodash#8a26eb4
 
 # GitHub dependencies with full URL
-bun install lodash@https://github.com/lodash/lodash
+bun3nix install https://github.com/lodash/lodash
+
+# GitHub dependencies with custom name
+bun3nix install lorem@https://github.com/lodash/lodash
 ```
 
 ## LICENCE
