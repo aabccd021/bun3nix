@@ -66,7 +66,7 @@ ls package.json # doesn't exist
 The `bun3nix` command is just a single JavaScript file that requires Bun to run.
 You can use one of the following methods to run it.
 
-### Pipe from `curl`
+### Oneliner
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js | bun - install is-even > ./npm_deps.nix
@@ -79,7 +79,7 @@ curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/i
 bun ./bun3nix.js install is-even > ./npm_deps.nix
 ```
 
-### Executable script
+### Executable script, optionally installed globally
 
 ```sh
 # Ensure the 'bun' command is available
@@ -95,7 +95,7 @@ mv ./bun3nix /usr/local/bin/bun3nix
 bun3nix install is-even > ./npm_deps.nix
 ```
 
-### Nix flake input
+### Nix flake
 
 ```nix
 {
@@ -121,6 +121,28 @@ Then run it with:
 
 ```sh
 nix run .#bun3nix install is-even > ./npm_deps.nix
+```
+
+### Nix derivation
+
+```nix
+{
+  pkgs ? import <nixpkgs> { },
+}:
+let
+  bun3nix = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/aabccd021/bun2node_modules/ab42687dae433bbb97d7b4fd7e168f175fcb961d/index.js";
+    hash = "sha256-D5XXdhS5AA99hiE0JJgORODjm4Hvx8aos8wQRVj3lKw=";
+  };
+in
+pkgs.writeShellScriptBin "bun3nix" ''
+  exec ${pkgs.bun}/bin/bun ${bun3nix} "$@"
+''
+```
+
+```sh
+export PATH="$(nix-build ./bun3nix.nix)/bin:$PATH"
+bun3nix install is-even > ./npm_deps.nix
 ```
 
 ## Supported dependencies
