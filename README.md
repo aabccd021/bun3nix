@@ -4,18 +4,23 @@ Generate Nix expressions from Bun dependencies.
 
 ## Usage
 
-Generate `npm_deps.nix` and build it with `nix-build`:
+Generate `npm_deps.nix`
 
 ```sh
 nix run nixpkgs#bun install cowsay
 nix run github:aabccd021/bun3nix postinstall > ./npm_deps.nix
+```
 
+Build it with `nix-build`:
+
+```sh
 nix-build ./npm_deps.nix
 ls ./result/lib/node_modules
 ./result/bin/cowsay hello
+
 ```
 
-Or import it in your own Nix expressions:
+Import it in your own Nix expressions:
 
 ```nix
 { pkgs, ... }: {
