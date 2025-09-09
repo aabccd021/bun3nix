@@ -4,7 +4,11 @@ Generate a Nix expression for your npm dependencies using Bun.
 
 ## Usage
 
-Reference the generated `npm_deps.nix` in your Nix expression:
+Generate `npm_deps.nix` and import it in your Nix expression:
+
+```sh
+bun3nix install @tailwindcss/cli > ./npm_deps.nix
+```
 
 ```nix
 { pkgs, ... }: {
@@ -12,11 +16,8 @@ Reference the generated `npm_deps.nix` in your Nix expression:
   npm_deps = import ./npm_deps.nix { inherit pkgs; };
 
   my_drv = pkgs.runCommand "my_drv" { } ''
-    # List installed modules
-    ls ${npm_deps}/lib/node_modules
-
-    # Use a binary from installed dependencies
-    ${npm_deps}/bin/mycli
+    ls ${npm_deps}/lib/node_modules # List installed modules
+    ${npm_deps}/bin/tailwindcss # Use a binary from installed dependencies
   '';
 
 }
