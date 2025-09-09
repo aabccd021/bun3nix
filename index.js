@@ -99,7 +99,7 @@ const binTextLines = packages.flatMap(({ lockInfo, modulePath }) => {
   ]);
 });
 
-console.log(`{
+process.stdout.write(`{
   pkgs ? import <nixpkgs> { },
   ...
 }:
