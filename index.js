@@ -24,7 +24,7 @@ const bunLockJson = fs.readFileSync(`${cwd}/bun.lock`, "utf-8").replace(/,(\s*[}
 const bunLock = JSON.parse(bunLockJson);
 
 const packages = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
-  const modulePaths = [];
+  let modulePath = "";
   let baseName;
   let currentName = name;
   while (currentName) {
@@ -33,11 +33,10 @@ const packages = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
       .sort((a, b) => b.length - a.length)
       .at(0);
     const currentBaseName = depName ? currentName.substring(depName.length + 1) : currentName;
-    modulePaths.push(currentBaseName);
+    modulePath += `node_modules/${currentBaseName}/${modulePath}`;
     baseName = baseName ?? currentBaseName;
     currentName = depName;
   }
-  const modulePath = modulePaths.reverse().join("/node_modules/");
   return { baseName, modulePath, lockInfo };
 });
 
@@ -62,11 +61,11 @@ const fetchTextLines = packages.flatMap(({ baseName, modulePath, lockInfo }) => 
   const isGithubDep = identifier.startsWith("github:");
   if (isGithubDep) {
     const url = new URL(identifier.replace("github:", "https://github.com/"));
-    const bunTag = fs.readFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, "utf-8");
+    const bunTag = fs.readFileSync(`${cwd}/${modulePath}/.bun-tag`, "utf-8");
     try {
-      fs.rmSync(`${cwd}/node_modules/${modulePath}/.bun-tag`);
+      fs.rmSync(`${cwd}/${modulePath}/.bun-tag`);
       const hash = child_process.execSync(
-        `nix-hash --base64 --type sha512 --sri ${cwd}/node_modules/${modulePath}`,
+        `nix-hash --base64 --type sha512 --sri ${cwd}/${modulePath}`,
         { encoding: "utf-8" },
       );
       return [
@@ -77,7 +76,7 @@ const fetchTextLines = packages.flatMap(({ baseName, modulePath, lockInfo }) => 
         `};`,
       ];
     } finally {
-      fs.writeFileSync(`${cwd}/node_modules/${modulePath}/.bun-tag`, bunTag);
+      fs.writeFileSync(`${cwd}/${modulePath}/.bun-tag`, bunTag);
     }
   }
 
@@ -90,8 +89,8 @@ const binTextLines = packages.flatMap(({ lockInfo, modulePath }) => {
     return [];
   }
   return Object.entries(bins).flatMap(([binName, binPath]) => [
-    `patchShebangs --host "$out/lib/node_modules/${modulePath}/${binPath}"`,
-    `ln -s "$out/lib/node_modules/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
+    `patchShebangs --host "$out/lib/${modulePath}/${binPath}"`,
+    `ln -s "$out/lib/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
   ]);
 });
 
@@ -112,10 +111,10 @@ ${fetchTextLines.map((line) => `    ${line}`).join("\n")}
   };
   packageCommands = lib.pipe packages [
     (lib.mapAttrsToList (
-      name: package: ''
-        mkdir -p "$out/lib/node_modules/\${name}"
-        cp -Lr \${package}/* "$out/lib/node_modules/\${name}"
-        chmod -R u+w "$out/lib/node_modules/\${name}"
+      modulePath: package: ''
+        mkdir -p "$out/lib/\${modulePath}"
+        cp -Lr \${package}/* "$out/lib/\${modulePath}"
+        chmod -R u+w "$out/lib/\${modulePath}"
       ''
     ))
     (lib.concatStringsSep "\\n")
