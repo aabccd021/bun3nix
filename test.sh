@@ -65,7 +65,6 @@ setup_test() {
         @types/bun@1.2.21 \
         nanoid@https://github.com/ai/nanoid \
         >./npm_deps.nix
-
     for path in ./node_modules ./package.json ./bun.lock ./bun.lockb; do
         if [ -e "$path" ]; then
             echo "$path should not exist"
@@ -104,12 +103,7 @@ setup_test() {
         >./npm_deps.nix
     deps=$(nix-build --no-out-link ./npm_deps.nix)
 
-    echo '
-        @import "tailwindcss";
-        @plugin "@iconify/tailwind4";
-        @plugin "daisyui";
-    ' >./style.css
-
+    echo '@import "tailwindcss"; @plugin "@iconify/tailwind4"; @plugin "daisyui"; ' >./style.css
     echo 'button class="icon-[heroicons--rss-solid] btn btn-soft"></button>' >./index.html
 
     NODE_PATH="$deps/lib/node_modules" \
@@ -118,7 +112,6 @@ setup_test() {
     for text in "\.btn" "\.btn-soft" "heroicons--rss-solid"; do
         if ! grep -q "$text" ./output.css; then
             echo "text not found: $text"
-            cat ./output.css
             exit 1
         fi
     done
@@ -144,12 +137,7 @@ setup_test() {
     bun3nix install @tailwindcss/cli@4.1.11 >./cli_deps.nix
     cli_deps=$(nix-build --no-out-link ./cli_deps.nix)
 
-    echo '
-        @import "tailwindcss";
-        @plugin "@iconify/tailwind4";
-        @plugin "daisyui";
-    ' >./style.css
-
+    echo '@import "tailwindcss"; @plugin "@iconify/tailwind4"; @plugin "daisyui";' >./style.css
     echo 'button class="icon-[heroicons--rss-solid] btn btn-soft"></button>' >./index.html
 
     NODE_PATH="$plugin_deps/lib/node_modules" \
@@ -158,7 +146,6 @@ setup_test() {
     for text in "\.btn" "\.btn-soft" "heroicons--rss-solid"; do
         if ! grep -q "$text" ./output.css; then
             echo "text not found: $text"
-            cat ./output.css
             exit 1
         fi
     done
