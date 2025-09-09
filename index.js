@@ -18,7 +18,7 @@ if (subcommand === "install") {
   process.on("exit", () => fs.rmSync(cwd, { recursive: true, force: true }));
 
   cwd = tmpdir;
-  child_process.execSync(`bun add ${args.join(" ")}`, { cwd });
+  child_process.execSync(`${process.argv[0]} add ${args.join(" ")}`, { cwd });
 } else if (subcommand !== "postinstall") {
   console.error(`Unknown subcommand: ${subcommand}`);
   process.exit(1);

@@ -69,14 +69,14 @@ You can use one of the following methods to run it.
 ### Download and pipe to Bun
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js | nix run nixpkgs#bun -- run - install is-even > ./npm_deps.nix
+curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js | bun run - install is-even > ./npm_deps.nix
 ```
 
 ### Download and run with Bun
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js -o ./bun3nix.js
-nix run nixpkgs#bun ./bun3nix.js install is-even > ./npm_deps.nix
+bun ./bun3nix.js install is-even > ./npm_deps.nix
 ```
 
 ### Executable script, optionally installed globally
@@ -110,9 +110,13 @@ bun3nix install is-even > ./npm_deps.nix
       pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
     in
     {
-      packages.x86_64-linux.bun3nix = pkgs.writeShellScriptBin "bun3nix" ''
-        exec ${pkgs.bun}/bin/bun ${inputs.bun3nix} "$@"
-      '';
+      packages.x86_64-linux.bun3nix = pkgs.writeShellApplication {
+        name = "bun3nix";
+        runtimeInputs = [ pkgs.bun ];
+        text = ''
+          exec ${pkgs.bun}/bin/bun ${inputs.bun3nix} "$@"
+        '';
+      };
     };
 }
 ```
