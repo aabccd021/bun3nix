@@ -63,6 +63,9 @@ ls package.json # doesn't exist
 
 ## Installation
 
+The `bun3nix` command is just a single JavaScript file that requires Bun to run.
+You can use one of the following methods to run it.
+
 ### Pipe from `curl`
 
 ```sh
@@ -107,6 +110,12 @@ chmod +x ./bun3nix
       '';
     };
 }
+```
+
+Then run it with:
+
+```sh
+nix run .#bun3nix -- install is-even > ./npm_deps.nix
 ```
 
 ## Supported dependencies
