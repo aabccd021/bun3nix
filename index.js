@@ -10,7 +10,6 @@ let cwd = process.cwd();
 const [subcommand, ...args] = process.argv.slice(2);
 if (subcommand === "install") {
   if (args.length === 0) {
-    console.error("Usage: bun3nix install <package>...");
     process.exit(1);
   }
   const tmpdir = fs.mkdtempSync(`${os.tmpdir()}/bun3nix-`);
@@ -18,7 +17,6 @@ if (subcommand === "install") {
   cwd = tmpdir;
   child_process.execSync(`${process.argv[0]} add ${args.join(" ")}`, { cwd });
 } else if (subcommand !== "postinstall") {
-  console.error(`Unknown subcommand: ${subcommand}`);
   process.exit(1);
 }
 
