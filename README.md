@@ -1,15 +1,21 @@
 # :snowflake: bun3nix
 
-Generate a Nix expression for your npm dependencies using Bun.
+Npm dependencies codegen using Bun.
 
 ## Usage
 
-Generate `npm_deps.nix` and import it in your Nix expression:
+Generate `npm_deps.nix` and build it with `nix-build`:
 
 ```sh
-nix run nixpkgs#bun install @tailwindcss/cli
+nix run nixpkgs#bun install cowsay
 nix run github:aabccd021/bun3nix postinstall > ./npm_deps.nix
+
+nix-build ./npm_deps.nix
+ls ./result/lib/node_modules
+./result/bin/cowsay hello
 ```
+
+Or import it:
 
 ```nix
 { pkgs, ... }: {
@@ -17,16 +23,14 @@ nix run github:aabccd021/bun3nix postinstall > ./npm_deps.nix
   npm_deps = import ./npm_deps.nix { inherit pkgs; };
 
   my_drv = pkgs.runCommand "my_drv" { } ''
-    ls ${npm_deps}/lib/node_modules # List installed modules
-    ${npm_deps}/bin/tailwindcss # Use a binary from installed dependencies
+    ls ${npm_deps}/lib/node_modules
+    ${npm_deps}/bin/cowsay hello
   '';
 
 }
 ```
 
-## Generating nix expression
-
-There are two subcommands to generate the Nix expression: `postinstall` and `install`.
+## Subcommands
 
 ### `postinstall` subcommand
 
