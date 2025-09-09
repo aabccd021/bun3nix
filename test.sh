@@ -30,8 +30,8 @@ setup_test() {
         is-even@1.0.0 \
         lodash@github:lodash/lodash#8a26eb4 \
         @types/bun@1.2.21 \
-        nanoid@https://github.com/ai/nanoid \
-        bun3nix postinstall >./npm_deps.nix
+        nanoid@https://github.com/ai/nanoid
+    bun3nix postinstall >./npm_deps.nix
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
     nix run nixpkgs#nixfmt -- --strict ./npm_deps_formatted.nix
@@ -49,7 +49,8 @@ setup_test() {
         strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
         strictEqual(nanoid().length, 21);
     ' >./test.ts
-    # use nodejs instead of bun because bun runs fine without node_modules
+    # use nodejs instead of bun because bun sometimes automatically download dependencies
+    # even without package.json, bun.lock, or node_modules
     nix run nixpkgs#nodejs ./test.ts
     nix run nixpkgs#typescript -- --noEmit ./test.ts
 )
