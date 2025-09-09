@@ -23,9 +23,9 @@ bun3nix install @tailwindcss/cli > ./npm_deps.nix
 }
 ```
 
-## Subcommands
+## Generating nix expression
 
-### `postinstall`
+### `postinstall` subcommand
 
 Run this subcommand **after** running `bun install`.  
 This subcommand assumes `bun.lock` are present in the current directory.
@@ -47,7 +47,7 @@ after `bun install` and in the same directory as `package.json`:
 }
 ```
 
-### `install`
+### `install` subcommand
 
 Use this subcommand if you don't need `package.json`, `bun.lock`, or `node_modules` in your project:
 
