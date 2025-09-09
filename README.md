@@ -75,8 +75,8 @@ ls package.json # doesn't exist
 
 ## Supported dependencies
 
-Currently, only npm and github dependencies are supported.  
-Contributions are welcome to add support for other sources!
+Currently, only npm and github dependencies are supported. Contributions are welcome to add support
+for other sources!
 
 ```sh
 # All command below also works with `bun install` + `bun3nix postinstall`
