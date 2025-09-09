@@ -40,6 +40,11 @@
 
     in
     {
+      packages = forAllSystems (pkgs: {
+        default = pkgs.writeShellScriptBin "bun3nix" ''
+          exec ${pkgs.bun}/bin/bun ${./index.js} "$@"
+        '';
+      });
       checks = forAllSystems (pkgs: {
         formatting = (treefmtEval pkgs).config.build.check self;
       });
