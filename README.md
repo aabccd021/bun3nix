@@ -1,21 +1,41 @@
 # :snowflake: bun3nix
 
-Generate nix expression of npm dependencies using Bun.
+Generate a Nix expression for your npm dependencies using Bun.
+
+## Usage
+
+Reference the generated `npm_deps.nix` in your Nix expression:
+
+```nix
+{ pkgs, ... }: {
+
+  npm_deps = import ./npm_deps.nix { inherit pkgs; };
+
+  my_drv = pkgs.runCommand "my_drv" { } ''
+    # List installed modules
+    ls ${npm_deps}/lib/node_modules
+
+    # Use a binary from installed dependencies
+    ${npm_deps}/bin/mycli
+  '';
+
+}
+```
 
 ## Subcommands
 
-### `postinstall` subcommand
+### `postinstall`
 
-You should only run this subcommand after `bun install`.
-This subcommand assumes that `node_modules` and `bun.lock` are present in the current directory.
+Run this subcommand **after** running `bun install`.  
+It assumes `node_modules` and `bun.lock` are present in the current directory.
 
 ```sh
-bun install is-even @types/bun # this will generate package.json, bun.lock and node_modules
+bun install is-even @types/bun # generates package.json, bun.lock, and node_modules
 bun3nix postinstall > ./npm_deps.nix
 ```
 
-Usually you would want to add this to your `package.json` as a `postinstall` script,
-this way it always run on the same directory as `package.json`.
+Typically, you’d add this as a `postinstall` script in your `package.json` to ensure it always runs
+in the same directory as `package.json`:
 
 ```json
 {
@@ -25,66 +45,45 @@ this way it always run on the same directory as `package.json`.
 }
 ```
 
-### `install` subcommand
+### `install`
 
-You can use this subcommand if you don't need `package.json`, `bun.lock` or `node_modules` in your
-project.
+Use this subcommand if you do **not** need `package.json`, `bun.lock`, or `node_modules` in your
+project:
 
 ```sh
-bun3nix install is-even @types/bun > ./npm_deps.n
-```
-
-## Usage
-
-Use the generated `npm_deps.nix` from your nix expression:
-
-```nix
-{ pkgs, ... }: {
-
-  npm_deps = import ./npm_deps.nix { inherit pkgs; };
-
-  my_drv = pkgs.runCommand "my_drv" { } ''
-    # do something with node_modules
-    ls ${npm_deps}/lib/node_modules
-    # use a binary from installed dependencies
-    ${npm_deps}/bin/mycli
-  '';
-
-}
+bun3nix install is-even @types/bun > ./npm_deps.nix
 ```
 
 ## Installation
 
-### Pipe from `curl`
+### 1. Pipe from `curl`
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js | bun - install is-even > ./npm_deps.nix
 ```
 
-### Download and run
+### 2. Download and run
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js -o ./bun3nix.js
 bun ./bun3nix.js install is-even > ./npm_deps.nix
 ```
 
-### Executable script
+### 3. Executable script
 
 ```sh
-# make sure bun command is available
+# Ensure the 'bun' command is available
 bun --version
 
 curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js -o /usr/local/bin/bun3nix
 chmod +x /usr/local/bin/bun3nix
 /usr/local/bin/bun3nix install is-even > ./npm_deps.nix
 
-# if `/usr/local/bin` is in your $PATH
+# If `/usr/local/bin` is in your $PATH, you can just run:
 bun3nix install is-even > ./npm_deps.nix
 ```
 
-### Nix flake input
-
-Here is how I personally do it
+### 4. Nix flake input
 
 ```nix
 {
@@ -95,27 +94,27 @@ Here is how I personally do it
   };
 
   outputs = inputs:
-  let
-    pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
-  in
-  {
-    packages.x86_64-linux.bun3nix = pkgs.writeShellScriptBin "bun3nix" ''
-      exec ${pkgs.bun}/bin/bun ${inputs.bun3nix} "$@"
-    '';
-  };
+    let
+      pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
+    in
+    {
+      packages.x86_64-linux.bun3nix = pkgs.writeShellScriptBin "bun3nix" ''
+        exec ${pkgs.bun}/bin/bun ${inputs.bun3nix} "$@"
+      '';
+    };
 }
 ```
 
 ## Supported dependencies
 
-Currently only npm and github dependencies are supported.
-Contributions are welcome to add support for other sources.
+Currently, only **npm** and **GitHub** dependencies are supported.  
+Contributions are welcome to add support for other sources!
 
 ```sh
 # npm dependencies
 bun install is-even
 
-# github dependencies
+# GitHub dependencies
 bun install lodash@github:lodash/lodash#8a26eb4
 bun install lodash@https://github.com/lodash/lodash
 ```
