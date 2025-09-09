@@ -156,15 +156,15 @@ nix run github:aabccd021/bun3nix install @tailwindcss/cli tailwindcss daisyui > 
 ```nix
 { pkgs, ... }: rec {
 
-    tailwindcss_deps = import ./tailwindcss_deps.nix { inherit pkgs; };
+  tailwindcss_deps = import ./tailwindcss_deps.nix { inherit pkgs; };
 
-    tailwindcss_with_plugins = pkgs.writeShellApplication {
-      name = "tailwindcss";
-      runtimeEnv.NODE_PATH = "${tailwindcss_deps}/lib/node_modules";
-      text = ''
-        exec ${tailwindcss_deps}/bin/tailwindcss "$@"
-      '';
-    };
+  tailwindcss_with_plugins = pkgs.writeShellApplication {
+    name = "tailwindcss";
+    runtimeEnv.NODE_PATH = "${tailwindcss_deps}/lib/node_modules";
+    text = ''
+      exec ${tailwindcss_deps}/bin/tailwindcss "$@"
+    '';
+  };
 }
 ```
 
