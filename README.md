@@ -36,7 +36,7 @@ bun3nix postinstall > ./npm_deps.nix
 ```
 
 Typically, you’d add this as a `postinstall` script in your `package.json` to ensure it always runs
-in the same directory as `package.json`:
+after `bun install` and in the same directory as `package.json`:
 
 ```json
 {
@@ -48,11 +48,14 @@ in the same directory as `package.json`:
 
 ### `install`
 
-Use this subcommand if you do **not** need `package.json`, `bun.lock`, or `node_modules` in your
-project:
+Use this subcommand if you don't need `package.json`, `bun.lock`, or `node_modules` in your project:
 
 ```sh
 bun3nix install is-even @types/bun > ./npm_deps.nix
+
+ls node_modules # doesn't exist
+ls bun.lock # doesn't exist
+ls package.json # doesn't exist
 ```
 
 ## Installation
@@ -76,12 +79,9 @@ bun ./bun3nix.js install is-even > ./npm_deps.nix
 # Ensure the 'bun' command is available
 bun --version
 
-curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js -o /usr/local/bin/bun3nix
-chmod +x /usr/local/bin/bun3nix
-/usr/local/bin/bun3nix install is-even > ./npm_deps.nix
-
-# If `/usr/local/bin` is in your $PATH, you can just run:
-bun3nix install is-even > ./npm_deps.nix
+curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js -o ./bun3nix
+chmod +x ./bun3nix
+./bun3nix install is-even > ./npm_deps.nix
 ```
 
 ### 4. Nix flake input
