@@ -25,6 +25,8 @@ bun3nix install @tailwindcss/cli > ./npm_deps.nix
 
 ## Generating nix expression
 
+There are two subcommands to generate the Nix expression: `postinstall` and `install`.
+
 ### `postinstall` subcommand
 
 Run this subcommand **after** running `bun install`.  
