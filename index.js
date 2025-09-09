@@ -33,7 +33,7 @@ const packages = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
       .sort((a, b) => b.length - a.length)
       .at(0);
     const currentBaseName = depName ? currentName.substring(depName.length + 1) : currentName;
-    modulePath += `node_modules/${currentBaseName}/${modulePath}`;
+    modulePath = `node_modules/${currentBaseName}/${modulePath}`;
     baseName = baseName ?? currentBaseName;
     currentName = depName;
   }
@@ -89,8 +89,8 @@ const binTextLines = packages.flatMap(({ lockInfo, modulePath }) => {
     return [];
   }
   return Object.entries(bins).flatMap(([binName, binPath]) => [
-    `patchShebangs --host "$out/lib/${modulePath}/${binPath}"`,
-    `ln -s "$out/lib/${modulePath}/${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
+    `patchShebangs --host "$out/lib/${modulePath}${binPath}"`,
+    `ln -s "$out/lib/${modulePath}${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
   ]);
 });
 
@@ -112,7 +112,8 @@ ${fetchTextLines.map((line) => `    ${line}`).join("\n")}
   packageCommands = lib.pipe packages [
     (lib.mapAttrsToList (
       modulePath: package: ''
-        cp -Lr \${package} "$out/lib/\${modulePath}"
+        mkdir -p "$out/lib/\${modulePath}"
+        cp -Lr \${package}/* "$out/lib/\${modulePath}"
         chmod -R u+w "$out/lib/\${modulePath}"
       ''
     ))
@@ -120,8 +121,8 @@ ${fetchTextLines.map((line) => `    ${line}`).join("\n")}
   ];
 in
 (pkgs.runCommand "node_modules" { buildInputs = [ pkgs.nodejs ]; } ''
-  mkdir -p "$out/lib/node_modules/.bin"
-  \${packageCommands}${binTextLines.map((line) => `\n  ${line}`).join("")}
+  \${packageCommands}
+  mkdir -p "$out/lib/node_modules/.bin"${binTextLines.map((line) => `\n  ${line}`).join("")}
   ln -s "$out/lib/node_modules/.bin" "$out/bin"
 '')
 `);
