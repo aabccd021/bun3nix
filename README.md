@@ -82,7 +82,7 @@ nix run nixpkgs#bun ./bun3nix.js install is-even > ./npm_deps.nix
 ### Executable script, optionally installed globally
 
 ```sh
-# Ensure the 'bun' command is available
+# Ensure the 'bun' command is available on your $PATH
 bun --version
 
 # Download, make executable, and run
