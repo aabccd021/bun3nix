@@ -29,7 +29,6 @@
           programs.biome.formatUnsafe = true;
           programs.biome.settings.formatter.indentStyle = "space";
           programs.biome.settings.formatter.lineWidth = 100;
-          programs.biome.settings.linter.rules.suspicious.noConsole = "error";
           programs.shfmt.enable = true;
           programs.shellcheck.enable = true;
           settings.formatter.shellcheck.options = [
