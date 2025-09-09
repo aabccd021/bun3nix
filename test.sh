@@ -26,8 +26,12 @@ setup_test() {
     echo "# postinstall: success"
     setup_test
 
-    bun install is-even@1.0.0 lodash@github:lodash/lodash#8a26eb4 @types/bun@1.2.21
-    bun3nix postinstall >./npm_deps.nix
+    bun install \
+        is-even@1.0.0 \
+        lodash@github:lodash/lodash#8a26eb4 \
+        @types/bun@1.2.21 \
+        nanoid@https://github.com/ai/nanoid \
+        bun3nix postinstall >./npm_deps.nix
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
     nix run nixpkgs#nixfmt -- --strict ./npm_deps_formatted.nix
@@ -41,7 +45,9 @@ setup_test() {
         import isEven from "is-even";
         import _ from "lodash";
         import { strictEqual } from "node:assert";
+        import { nanoid } from "nanoid";
         strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
+        strictEqual(nanoid().length, 21);
     ' >./test.ts
     # use nodejs instead of bun because bun runs fine without node_modules
     nix run nixpkgs#nodejs ./test.ts
@@ -52,7 +58,12 @@ setup_test() {
     echo "# install: success"
     setup_test
 
-    bun3nix install github:lodash/lodash#8a26eb4 @types/bun@1.2.21 is-even@1.0.0 >./npm_deps.nix
+    bun3nix install \
+        is-even@1.0.0 \
+        lodash@github:lodash/lodash#8a26eb4 \
+        @types/bun@1.2.21 \
+        nanoid@https://github.com/ai/nanoid \
+        >./npm_deps.nix
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
     nix run nixpkgs#nixfmt -- --strict ./npm_deps_formatted
@@ -71,7 +82,9 @@ setup_test() {
         import isEven from "is-even";
         import _ from "lodash";
         import { strictEqual } from "node:assert";
+        import { nanoid } from "nanoid";
         strictEqual(_.filter([1, 2, 3], isEven).at(0), 2);
+        strictEqual(nanoid().length, 21);
     ' >./test.ts
     nix run nixpkgs#nodejs ./test.ts
     nix run nixpkgs#typescript -- --noEmit ./test.ts
