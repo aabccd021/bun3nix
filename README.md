@@ -85,9 +85,14 @@ bun ./bun3nix.js install is-even > ./npm_deps.nix
 # Ensure the 'bun' command is available
 bun --version
 
+# Download, make executable, and run
 curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js -o ./bun3nix
 chmod +x ./bun3nix
 ./bun3nix install is-even > ./npm_deps.nix
+
+# Install globally, assuming /usr/local/bin is in $PATH
+mv ./bun3nix /usr/local/bin/bun3nix
+bun3nix install is-even > ./npm_deps.nix
 ```
 
 ### Nix flake input
