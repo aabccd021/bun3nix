@@ -61,20 +61,20 @@ ls package.json # doesn't exist
 
 ## Installation
 
-### 1. Pipe from `curl`
+### Pipe from `curl`
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js | bun - install is-even > ./npm_deps.nix
 ```
 
-### 2. Download and run
+### Download and run
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js -o ./bun3nix.js
 bun ./bun3nix.js install is-even > ./npm_deps.nix
 ```
 
-### 3. Executable script
+### Executable script
 
 ```sh
 # Ensure the 'bun' command is available
@@ -85,7 +85,7 @@ chmod +x ./bun3nix
 ./bun3nix install is-even > ./npm_deps.nix
 ```
 
-### 4. Nix flake input
+### Nix flake input
 
 ```nix
 {
