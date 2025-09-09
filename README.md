@@ -1,39 +1,94 @@
 # :snowflake: bun3nix
 
-Generate `npm_deps.nix` from `bun.lock`.
+Generate nix expression of npm dependencies using Bun.
 
-## Usage
+## Modes
 
-Add `postinstall` script to your `package.json`, then run `bun install`.
+### `postinstall` mode
+
+You should only run this mode after `bun install`.
+This mode assumes that `node_modules` and `bun.lock` are present in the current directory.
+
+```sh
+bun install is-even @types/bun # this will generate package.json, bun.lock and node_modules
+bun3nix postinstall > ./npm_deps.nix
+```
+
+Usually you would want to add this to your `package.json` as a `postinstall` script,
+this way it always run on the same directory as `package.json`.
 
 ```json
 {
   "scripts": {
-    "postinstall": "curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js | bun - --postinstall > ./npm_deps.nix"
+    "postinstall": "bun3nix postinstall > ./npm_deps.nix"
   }
 }
 ```
 
+### `install` mode
+
+You might want to use this mode if you don't need `package.json`, `bun.lock` or `node_modules`
+in your project.
+
+```sh
+bun3nix install is-even @types/bun > ./npm_deps.n
+```
+
+## Usage
+
 Use the generated `npm_deps.nix` from your nix expression:
 
 ```nix
-{ pkgs, ... }:
-{
+{ pkgs, ... }: {
+
   npm_deps = import ./npm_deps.nix { inherit pkgs; };
 
-  dependencyCount = pkgs.runCommand "count-deps" { } ''
-    count=$(ls ${npm_deps}/lib/node_modules | wc -l)
-    echo "There are $count dependencies" > "$out"
+  my_drv = pkgs.runCommand "my_drv" { } ''
+    # do something with node_modules
+    ls ${npm_deps}/lib/node_modules
+    # use a binary from installed dependencies
+    ${npm_deps}/bin/mycli
   '';
+
 }
 ```
 
-## Using the JS file as flake input
+## Installation
+
+### Pipe from `curl`
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js | bun - install is-even > ./npm_deps.nix
+```
+
+### Download and run
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js -o ./bun3nix.js
+bun ./bun3nix.js install is-even > ./npm_deps.nix
+```
+
+### Executable script
+
+```sh
+# make sure bun command is available
+bun --version
+
+curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js -o /usr/local/bin/bun3nix
+chmod +x /usr/local/bin/bun3nix
+/usr/local/bin/bun3nix install is-even > ./npm_deps.nix
+
+# if `/usr/local/bin` is in your $PATH
+bun3nix install is-even > ./npm_deps.nix
+```
+
+### Nix flake input
 
 Here is how I personally do it
 
 ```nix
 {
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   inputs.bun3nix = {
     url = "https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js";
     flake = false;
@@ -44,28 +99,21 @@ Here is how I personally do it
     pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
   in
   {
-    packages.x86_64-linux.postinstall = pkgs.writeShellScriptBin "postinstall" ''
-      exec ${pkgs.bun}/bin/bun ${inputs.bun3nix} > ./npm_deps.nix
+    packages.x86_64-linux.bun3nix = pkgs.writeShellScriptBin "bun3nix" ''
+      exec ${pkgs.bun}/bin/bun ${inputs.bun3nix} "$@"
     '';
   };
 }
 ```
 
-```json
-{
-  "scripts": {
-    "postinstall": "nix run .#postinstall"
-  }
-}
-```
-
 ## Supported dependencies
 
-Currently npm and github dependencies are supported.
+Currently only npm and github dependencies are supported.
+Contributions are welcome to add support for other sources.
 
 ```sh
 # npm dependencies
-bun install is-even@1.0.0
+bun install is-even
 
 # github dependencies
 bun install lodash@github:lodash/lodash#8a26eb4
