@@ -40,7 +40,7 @@ Import it in your own Nix expressions:
 
 ### `postinstall` subcommand
 
-Run this subcommand **after** running `bun install`. This subcommand assumes `bun.lock` are present
+Run this subcommand only after running `bun install`. This subcommand assumes `bun.lock` are present
 in the current directory. The `node_modules` should also be present if you use github dependencies.
 
 ```sh
