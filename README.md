@@ -15,7 +15,7 @@ ls ./result/lib/node_modules
 ./result/bin/cowsay hello
 ```
 
-Or import it:
+Or import it in your own Nix expressions:
 
 ```nix
 { pkgs, ... }: {
@@ -57,7 +57,8 @@ after `bun install` and in the same directory as `package.json`:
 
 ### `install` subcommand
 
-Use this subcommand if you don't need `package.json`, `bun.lock`, or `node_modules` in your project:
+Use this subcommand if you don't want to have any of `package.json`, `bun.lock`, or `node_modules`
+in your project:
 
 ```sh
 nix run github:aabccd021/bun3nix install is-even @types/bun > ./npm_deps.nix
@@ -69,7 +70,7 @@ ls package.json # doesn't exist
 
 ## Supported dependencies
 
-Currently, only **npm** and **GitHub** dependencies are supported.  
+Currently, only npm and GitHub dependencies are supported.  
 Contributions are welcome to add support for other sources!
 
 ```sh
