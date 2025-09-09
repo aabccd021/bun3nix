@@ -98,7 +98,8 @@ bun install lorem@https://github.com/lodash/lodash
 
 The `@tailwindcss/node` package [respects `NODE_PATH` to locate plugins](https://github.com/tailwindlabs/tailwindcss/blob/2f1cbbfed28729798eebdaa57935e8f7b0c622e1/packages/%40tailwindcss-node/src/compile.ts#L207).
 
-So you can use `bun3nix` to install Tailwind CSS plugins and run `tailwindcss` with those plugins:
+So ideally, you can use `bun3nix` to install Tailwind CSS plugins and run `tailwindcss` with those
+plugins:
 
 ```sh
 nix run github:aabccd021/bun3nix install tailwindcss daisyui > tailwindcss_plugins.nix
