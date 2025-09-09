@@ -117,10 +117,11 @@ bun3nix install is-even > ./npm_deps.nix
 }
 ```
 
-Then run it with:
-
 ```sh
 nix run .#bun3nix install is-even > ./npm_deps.nix
+
+# update bun3nix to the latest version
+nix flake update bun3nix
 ```
 
 ### Nix derivation
@@ -131,7 +132,7 @@ nix run .#bun3nix install is-even > ./npm_deps.nix
 }:
 let
   bun3nix = pkgs.fetchurl {
-    url = "https://raw.githubusercontent.com/aabccd021/bun2node_modules/ab42687dae433bbb97d7b4fd7e168f175fcb961d/index.js";
+    url = "https://raw.githubusercontent.com/aabccd021/bun3nix/ab42687dae433bbb97d7b4fd7e168f175fcb961d/index.js";
     hash = "sha256-D5XXdhS5AA99hiE0JJgORODjm4Hvx8aos8wQRVj3lKw=";
   };
 in
