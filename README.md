@@ -116,7 +116,7 @@ Contributions are welcome to add support for other sources!
 # npm dependencies
 bun install is-even
 
-# GitHub dependencies with github: prefix
+# GitHub dependencies with `github:` prefix
 bun install lodash@github:lodash/lodash#8a26eb4
 
 # GitHub dependencies with full URL
