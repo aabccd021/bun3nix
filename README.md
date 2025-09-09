@@ -25,6 +25,7 @@ Or import it:
   my_drv = pkgs.runCommand "my_drv" { } ''
     ls ${npm_deps}/lib/node_modules
     ${npm_deps}/bin/cowsay hello
+    touch "$out"
   '';
 
 }
