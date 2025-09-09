@@ -120,24 +120,20 @@ nix run github:aabccd021/bun3nix install tailwindcss daisyui > tailwindcss_plugi
 }
 ```
 
-Unfortunately, `nixpkgs#tailwindcss_4` doesn't use `@tailwindcss/node`,
-so you need to install it yourself.
-You can also use `bun3nix` to do this
+Unfortunately, this doesn't work with some plugins.
+From my testing, it works with `daisyui` but not with `@iconify/tailwind4`.
+
+As a workaround, you can use `bun3nix` to install `@tailwindcss/cli`.
 
 ```sh
-
-nix run github:aabccd021/bun3nix install tailwindcss daisyui > tailwindcss_plugins.nix
-
-# This includes `@tailwindcss/node`
-nix run github:aabccd021/bun3nix install @tailwindcss/cli > tailwindcss.nix
-
+nix run github:aabccd021/bun3nix install daisyui > tailwindcss_plugins.nix
+nix run github:aabccd021/bun3nix install tailwindcss  @tailwindcss/cli > tailwindcss.nix
 ```
 
 ```nix
 { pkgs, ... }: rec {
 
   tailwindcss = import ./tailwindcss.nix { inherit pkgs; };
-
   tailwindcss_plugins = import ./tailwindcss_plugins.nix { inherit pkgs; };
 
   tailwindcss_with_plugins = pkgs.writeShellApplication {
@@ -147,6 +143,27 @@ nix run github:aabccd021/bun3nix install @tailwindcss/cli > tailwindcss.nix
       exec ${tailwindcss}/bin/tailwindcss "$@"
     '';
   };
+}
+```
+
+Or you can install everything in one go:
+
+```sh
+nix run github:aabccd021/bun3nix install @tailwindcss/cli tailwindcss daisyui > tailwindcss_deps.nix
+```
+
+```nix
+{ pkgs, ... }: rec {
+
+    tailwindcss_deps = import ./tailwindcss_deps.nix { inherit pkgs; };
+
+    tailwindcss_with_plugins = pkgs.writeShellApplication {
+      name = "tailwindcss";
+      runtimeEnv.NODE_PATH = "${tailwindcss_deps}/lib/node_modules";
+      text = ''
+        exec ${tailwindcss_deps}/bin/tailwindcss "$@"
+      '';
+    };
 }
 ```
 
