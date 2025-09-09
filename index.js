@@ -13,10 +13,8 @@ if (subcommand === "install") {
     console.error("Usage: bun3nix install <package>...");
     process.exit(1);
   }
-
   const tmpdir = fs.mkdtempSync(`${os.tmpdir()}/bun3nix-`);
-  process.on("exit", () => fs.rmSync(cwd, { recursive: true, force: true }));
-
+  process.on("exit", () => fs.rmSync(tmpdir, { recursive: true, force: true }));
   cwd = tmpdir;
   child_process.execSync(`${process.argv[0]} add ${args.join(" ")}`, { cwd });
 } else if (subcommand !== "postinstall") {
