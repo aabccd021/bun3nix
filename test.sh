@@ -3,15 +3,15 @@ set -eu
 
 bun3nix="$PWD"
 
-setup_test() {
+test_setup() {
   tmpdir=$(mktemp -d)
   trap 'rm -rf $tmpdir' EXIT
   cd "$tmpdir" || exit 1
 }
 
 (
+  test_setup
   echo "# postinstall: success"
-  setup_test
 
   nix run nixpkgs#bun install \
     is-even@1.0.0 \
@@ -43,8 +43,8 @@ setup_test() {
 )
 
 (
+  test_setup
   echo "# postinstall: success with non-default package names"
-  setup_test
 
   nix run nixpkgs#bun install \
     is-even@1.0.0 \
@@ -74,8 +74,8 @@ setup_test() {
 )
 
 (
+  test_setup
   echo "# install: success"
-  setup_test
 
   nix run "$bun3nix" install \
     is-even@1.0.0 \
@@ -109,8 +109,8 @@ setup_test() {
 )
 
 (
+  test_setup
   echo "# install: success with non-default package names"
-  setup_test
 
   nix run "$bun3nix" install \
     is-even@1.0.0 \
@@ -144,8 +144,8 @@ setup_test() {
 )
 
 (
+  test_setup
   echo "# install: tailwindcss with plugins (same node_modules)"
-  setup_test
 
   nix run "$bun3nix" install \
     @iconify/json@2.2.359 \
@@ -176,8 +176,8 @@ setup_test() {
 )
 
 (
+  test_setup
   echo "# install: tailwindcss with plugins (separate node_modules)"
-  setup_test
 
   nix run "$bun3nix" install \
     @iconify/json@2.2.359 \
