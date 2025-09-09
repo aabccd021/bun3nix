@@ -4,14 +4,14 @@ Generate Nix expressions from Bun dependencies.
 
 ## Usage
 
-Generate `npm_deps.nix`
+Generate `npm_deps.nix`:
 
 ```sh
 nix run nixpkgs#bun install cowsay
 nix run github:aabccd021/bun3nix postinstall > ./npm_deps.nix
 ```
 
-Build it with `nix-build`:
+Then build it with `nix-build`:
 
 ```sh
 nix-build ./npm_deps.nix
@@ -20,7 +20,7 @@ ls ./result/lib/node_modules
 
 ```
 
-Import it in your own Nix expressions:
+Or import it in your own Nix expressions:
 
 ```nix
 { pkgs, ... }: {
@@ -49,7 +49,7 @@ nix run github:aabccd021/bun3nix postinstall > ./npm_deps.nix
 ```
 
 Typically, you’d add this as a `postinstall` script in your `package.json` to ensure it always runs
-after `bun install` and in the same directory as `package.json`:
+after `bun install` and in the same directory as `package.json`.
 
 ```json
 {
@@ -62,7 +62,8 @@ after `bun install` and in the same directory as `package.json`:
 ### `install` subcommand
 
 Use this subcommand if you don't want to have any of `package.json`, `bun.lock`, or `node_modules`
-in your project:
+in your project. The argument you pass to this subcommand will be passed directly to `bun install`
+internally.
 
 ```sh
 nix run github:aabccd021/bun3nix install is-even @types/bun > ./npm_deps.nix
@@ -81,23 +82,23 @@ for other sources!
 # All command below also works with `bun install` + `bun3nix postinstall`
 
 # npm dependencies
-bun install lodash
+bun3nix install lodash
 
 # github dependencies with `github:` prefix
-bun install github:lodash/lodash#8a26eb4
+bun3nix install github:lodash/lodash#8a26eb4
 
 # github dependencies with full URL
-bun install https://github.com/lodash/lodash
+bun3nix install https://github.com/lodash/lodash
 
 # github dependencies with custom name
-bun install lorem@https://github.com/lodash/lodash
+bun3nix install lorem@https://github.com/lodash/lodash
 ```
 
 ## Usage example with Tailwind CSS
 
 The `@tailwindcss/node` package [respects `NODE_PATH` to locate plugins](https://github.com/tailwindlabs/tailwindcss/blob/2f1cbbfed28729798eebdaa57935e8f7b0c622e1/packages/%40tailwindcss-node/src/compile.ts#L207).
 So ideally, you can use `bun3nix` to install Tailwind CSS plugins and run `tailwindcss` with those
-plugins:
+plugins.
 
 ```sh
 nix run github:aabccd021/bun3nix install daisyui > tailwindcss_plugins.nix
@@ -146,22 +147,22 @@ nix run github:aabccd021/bun3nix install tailwindcss  @tailwindcss/cli > tailwin
 }
 ```
 
-Or you can install everything in one go:
+Or you can install everything in one go.
 
 ```sh
-nix run github:aabccd021/bun3nix install @tailwindcss/cli tailwindcss daisyui > tailwindcss_deps.nix
+nix run github:aabccd021/bun3nix install @tailwindcss/cli tailwindcss daisyui > tailwindcss.nix
 ```
 
 ```nix
 { pkgs, ... }: rec {
 
-  tailwindcss_deps = import ./tailwindcss_deps.nix { inherit pkgs; };
+  tailwindcss = import ./tailwindcss.nix { inherit pkgs; };
 
   tailwindcss_with_plugins = pkgs.writeShellApplication {
     name = "tailwindcss";
-    runtimeEnv.NODE_PATH = "${tailwindcss_deps}/lib/node_modules";
+    runtimeEnv.NODE_PATH = "${tailwindcss}/lib/node_modules";
     text = ''
-      exec ${tailwindcss_deps}/bin/tailwindcss "$@"
+      exec ${tailwindcss}/bin/tailwindcss "$@"
     '';
   };
 
