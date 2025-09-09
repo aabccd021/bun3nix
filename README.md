@@ -2,12 +2,12 @@
 
 Generate nix expression of npm dependencies using Bun.
 
-## Modes
+## Subcommands
 
-### `postinstall` mode
+### `postinstall` subcommand
 
-You should only run this mode after `bun install`.
-This mode assumes that `node_modules` and `bun.lock` are present in the current directory.
+You should only run this subcommand after `bun install`.
+This subcommand assumes that `node_modules` and `bun.lock` are present in the current directory.
 
 ```sh
 bun install is-even @types/bun # this will generate package.json, bun.lock and node_modules
@@ -25,9 +25,9 @@ this way it always run on the same directory as `package.json`.
 }
 ```
 
-### `install` mode
+### `install` subcommand
 
-You might want to use this mode if you don't need `package.json`, `bun.lock` or `node_modules`
+You might want to use this subcommand if you don't need `package.json`, `bun.lock` or `node_modules`
 in your project.
 
 ```sh
