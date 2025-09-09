@@ -20,8 +20,7 @@ if (subcommand === "install") {
   process.exit(1);
 }
 
-const bunLockJsonC = fs.readFileSync(`${cwd}/bun.lock`, "utf-8");
-const bunLockJson = bunLockJsonC.replace(/,(\s*[}\]])/g, "$1");
+const bunLockJson = fs.readFileSync(`${cwd}/bun.lock`, "utf-8").replace(/,(\s*[}\]])/g, "$1");
 const bunLock = JSON.parse(bunLockJson);
 
 const packages = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
