@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eu
 
-bun3nix="$(git rev-parse --show-toplevel)/index.js"
+bun3nix="$PWD"
 
 setup_test() {
   tmpdir=$(mktemp -d)
@@ -18,7 +18,7 @@ setup_test() {
     @types/bun@1.2.21 \
     github:lodash/lodash#8a26eb4 \
     https://github.com/ai/nanoid
-  nix run nixpkgs#bun "$bun3nix" postinstall >./npm_deps.nix
+  nix run "$bun3nix" postinstall >./npm_deps.nix
 
   rm -rf ./node_modules
   cp -Lr "$(nix-build --no-out-link ./npm_deps.nix)/lib/node_modules" ./node_modules
@@ -51,7 +51,7 @@ setup_test() {
     @types/bun@1.2.21 \
     lorem@github:lodash/lodash#8a26eb4 \
     ipsum@https://github.com/ai/nanoid
-  nix run nixpkgs#bun "$bun3nix" postinstall >./npm_deps.nix
+  nix run "$bun3nix" postinstall >./npm_deps.nix
 
   rm -rf ./node_modules
   cp -Lr "$(nix-build --no-out-link ./npm_deps.nix)/lib/node_modules" ./node_modules
@@ -79,7 +79,7 @@ setup_test() {
   echo "# install: success"
   setup_test
 
-  nix run nixpkgs#bun "$bun3nix" install \
+  nix run "$bun3nix" install \
     is-even@1.0.0 \
     @types/bun@1.2.21 \
     github:lodash/lodash#8a26eb4 \
@@ -114,7 +114,7 @@ setup_test() {
   echo "# install: success with non-default package names"
   setup_test
 
-  nix run nixpkgs#bun "$bun3nix" install \
+  nix run "$bun3nix" install \
     is-even@1.0.0 \
     @types/bun@1.2.21 \
     lorem@github:lodash/lodash#8a26eb4 \
@@ -149,7 +149,7 @@ setup_test() {
   echo "# install: tailwindcss with plugins"
   setup_test
 
-  nix run nixpkgs#bun "$bun3nix" install \
+  nix run "$bun3nix" install \
     @iconify/json@2.2.359 \
     @iconify/tailwind4@1.0.6 \
     daisyui@5.0.46 \
@@ -181,7 +181,7 @@ setup_test() {
   echo "# install: tailwindcss with plugins (separate cli)"
   setup_test
 
-  nix run nixpkgs#bun "$bun3nix" install \
+  nix run "$bun3nix" install \
     @iconify/json@2.2.359 \
     @iconify/tailwind4@1.0.6 \
     daisyui@5.0.46 \
@@ -189,7 +189,7 @@ setup_test() {
     >./plugin_deps.nix
   plugin_deps=$(nix-build --no-out-link ./plugin_deps.nix)
 
-  nix run nixpkgs#bun "$bun3nix" install @tailwindcss/cli@4.1.11 >./cli_deps.nix
+  nix run "$bun3nix" install @tailwindcss/cli@4.1.11 >./cli_deps.nix
   cli_deps=$(nix-build --no-out-link ./cli_deps.nix)
 
   echo '@import "tailwindcss"; @plugin "@iconify/tailwind4"; @plugin "daisyui";' >./style.css

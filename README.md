@@ -7,7 +7,8 @@ Generate a Nix expression for your npm dependencies using Bun.
 Generate `npm_deps.nix` and import it in your Nix expression:
 
 ```sh
-bun3nix install @tailwindcss/cli > ./npm_deps.nix
+nix run nixpkgs#bun install @tailwindcss/cli
+nix run github:aabccd021/bun3nix postinstall > ./npm_deps.nix
 ```
 
 ```nix
@@ -34,8 +35,8 @@ This subcommand assumes `bun.lock` are present in the current directory.
 The `node_modules` should also be present if you use GitHub dependencies.
 
 ```sh
-bun install is-even @types/bun # generates package.json, bun.lock, and node_modules
-bun3nix postinstall > ./npm_deps.nix
+nix run nixpkgs#bun install is-even @types/bun # generates package.json, bun.lock, and node_modules
+nix run github:aabccd021/bun3nix postinstall > ./npm_deps.nix
 ```
 
 Typically, you’d add this as a `postinstall` script in your `package.json` to ensure it always runs
@@ -44,7 +45,7 @@ after `bun install` and in the same directory as `package.json`:
 ```json
 {
   "scripts": {
-    "postinstall": "bun3nix postinstall > ./npm_deps.nix"
+    "postinstall": "nix run github:aabccd021/bun3nix postinstall > ./npm_deps.nix"
   }
 }
 ```
@@ -54,96 +55,11 @@ after `bun install` and in the same directory as `package.json`:
 Use this subcommand if you don't need `package.json`, `bun.lock`, or `node_modules` in your project:
 
 ```sh
-bun3nix install is-even @types/bun > ./npm_deps.nix
+nix run github:aabccd021/bun3nix install is-even @types/bun > ./npm_deps.nix
 
 ls node_modules # doesn't exist
 ls bun.lock # doesn't exist
 ls package.json # doesn't exist
-```
-
-## Installation
-
-The `bun3nix` command is just a single JavaScript file that requires Bun to run.
-You can use one of the following methods to run it.
-
-### Download and pipe to Bun
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js | nix run nixpkgs#bun -- run - install is-even > ./npm_deps.nix
-```
-
-### Download and run with Bun
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js -o ./bun3nix.js
-nix run nixpkgs#bun ./bun3nix.js install is-even > ./npm_deps.nix
-```
-
-### Executable script, optionally installed globally
-
-```sh
-# Ensure the 'bun' command is available on your $PATH
-bun --version
-
-# Download, make executable, and run
-curl -fsSL https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js -o ./bun3nix
-chmod +x ./bun3nix
-./bun3nix install is-even > ./npm_deps.nix
-
-# Install globally, assuming /usr/local/bin is in $PATH
-mv ./bun3nix /usr/local/bin/bun3nix
-bun3nix install is-even > ./npm_deps.nix
-```
-
-### Nix flake
-
-```nix
-{
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-  inputs.bun3nix = {
-    url = "https://raw.githubusercontent.com/aabccd021/bun3nix/refs/heads/main/index.js";
-    flake = false;
-  };
-
-  outputs = inputs:
-    let
-      pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
-    in
-    {
-      packages.x86_64-linux.bun3nix = pkgs.writeShellScriptBin "bun3nix" ''
-        exec ${pkgs.bun}/bin/bun ${inputs.bun3nix} "$@"
-      '';
-    };
-}
-```
-
-```sh
-nix run .#bun3nix install is-even > ./npm_deps.nix
-
-# update bun3nix to the latest version
-nix flake update bun3nix
-```
-
-### Nix derivation
-
-```nix
-{
-  pkgs ? import <nixpkgs> { },
-}:
-let
-  bun3nix = pkgs.fetchurl {
-    url = "https://raw.githubusercontent.com/aabccd021/bun3nix/ab42687dae433bbb97d7b4fd7e168f175fcb961d/index.js";
-    hash = "sha256-D5XXdhS5AA99hiE0JJgORODjm4Hvx8aos8wQRVj3lKw=";
-  };
-in
-pkgs.writeShellScriptBin "bun3nix" ''
-  exec ${pkgs.bun}/bin/bun ${bun3nix} "$@"
-''
-```
-
-```sh
-export PATH="$(nix-build ./bun3nix.nix)/bin:$PATH"
-bun3nix install is-even > ./npm_deps.nix
 ```
 
 ## Supported dependencies
@@ -155,16 +71,16 @@ Contributions are welcome to add support for other sources!
 # All command below also works with `bun install` + `bun3nix postinstall`
 
 # npm dependencies
-bun3nix install is-even
+nix run github:aabccd021/bun3nix install is-even
 
 # GitHub dependencies with `github:` prefix
-bun3nix install github:lodash/lodash#8a26eb4
+nix run github:aabccd021/bun3nix install github:lodash/lodash#8a26eb4
 
 # GitHub dependencies with full URL
-bun3nix install https://github.com/lodash/lodash
+nix run github:aabccd021/bun3nix install https://github.com/lodash/lodash
 
 # GitHub dependencies with custom name
-bun3nix install lorem@https://github.com/lodash/lodash
+nix run github:aabccd021/bun3nix install lorem@https://github.com/lodash/lodash
 ```
 
 ## LICENCE
