@@ -7,9 +7,6 @@ cp "$(git rev-parse --show-toplevel)/index.js" "$tmpdir/bun3nix"
 PATH="$tmpdir:$PATH"
 export PATH
 
-# avoid rate limiting issues
-export BUN_CONFIG_MAX_HTTP_REQUESTS=1
-
 if ! command -v bun >/dev/null 2>&1; then
     bun_pkg=$(nix build nixpkgs#bun --no-link --print-out-paths)
     PATH="$bun_pkg/bin:$PATH"
