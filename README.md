@@ -27,8 +27,8 @@ this way it always run on the same directory as `package.json`.
 
 ### `install` subcommand
 
-You might want to use this subcommand if you don't need `package.json`, `bun.lock` or `node_modules`
-in your project.
+You can use this subcommand if you don't need `package.json`, `bun.lock` or `node_modules` in your
+project.
 
 ```sh
 bun3nix install is-even @types/bun > ./npm_deps.n
