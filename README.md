@@ -80,7 +80,7 @@ Contributions are welcome to add support for other sources!
 bun install lodash
 
 # github dependencies with `github:` prefix
-bun github:lodash/lodash#8a26eb4
+bun install github:lodash/lodash#8a26eb4
 
 # github dependencies with full URL
 bun install https://github.com/lodash/lodash
