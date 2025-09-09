@@ -31,7 +31,7 @@ There are two subcommands to generate the Nix expression: `postinstall` and `ins
 
 Run this subcommand **after** running `bun install`.  
 This subcommand assumes `bun.lock` are present in the current directory.
-`node_modules` should also be present if you use GitHub dependencies.
+The `node_modules` should also be present if you use GitHub dependencies.
 
 ```sh
 bun install is-even @types/bun # generates package.json, bun.lock, and node_modules
