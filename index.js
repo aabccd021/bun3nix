@@ -125,4 +125,5 @@ in
   \${packageCommands}
   mkdir -p "$out/lib/node_modules/.bin"${binTextLines.map((line) => `\n  ${line}`).join("")}
   ln -s "$out/lib/node_modules/.bin" "$out/bin"
-'')`);
+'')
+`);
