@@ -112,8 +112,7 @@ ${fetchTextLines.map((line) => `    ${line}`).join("\n")}
   packageCommands = lib.pipe packages [
     (lib.mapAttrsToList (
       modulePath: package: ''
-        mkdir -p "$out/lib/\${modulePath}"
-        cp -Lr \${package}/* "$out/lib/\${modulePath}"
+        cp -Lr \${package} "$out/lib/\${modulePath}"
         chmod -R u+w "$out/lib/\${modulePath}"
       ''
     ))
@@ -121,8 +120,8 @@ ${fetchTextLines.map((line) => `    ${line}`).join("\n")}
   ];
 in
 (pkgs.runCommand "node_modules" { buildInputs = [ pkgs.nodejs ]; } ''
-  \${packageCommands}
-  mkdir -p "$out/lib/node_modules/.bin"${binTextLines.map((line) => `\n  ${line}`).join("")}
+  mkdir -p "$out/lib/node_modules/.bin"
+  \${packageCommands}${binTextLines.map((line) => `\n  ${line}`).join("")}
   ln -s "$out/lib/node_modules/.bin" "$out/bin"
 '')
 `);
