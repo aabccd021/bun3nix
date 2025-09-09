@@ -23,11 +23,11 @@ setup_test() {
 }
 
 (
-    echo "# --postinstall"
+    echo "# postinstall: success"
     setup_test
 
     bun install is-even@1.0.0 lodash@github:lodash/lodash#8a26eb4 @types/bun@1.2.21
-    bun3nix --postinstall >./npm_deps.nix
+    bun3nix postinstall >./npm_deps.nix
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
     nix run nixpkgs#nixfmt -- --strict ./npm_deps_formatted.nix
@@ -49,10 +49,10 @@ setup_test() {
 )
 
 (
-    echo "# packages as arguments"
+    echo "# install: success"
     setup_test
 
-    bun3nix github:lodash/lodash#8a26eb4 @types/bun@1.2.21 is-even@1.0.0 >./npm_deps.nix
+    bun3nix install github:lodash/lodash#8a26eb4 @types/bun@1.2.21 is-even@1.0.0 >./npm_deps.nix
 
     cp ./npm_deps.nix ./npm_deps_formatted.nix
     nix run nixpkgs#nixfmt -- --strict ./npm_deps_formatted
@@ -78,10 +78,10 @@ setup_test() {
 )
 
 (
-    echo "# tailwindcss with plugins"
+    echo "# install: tailwindcss with plugins"
     setup_test
 
-    bun3nix \
+    bun3nix install \
         @iconify/json@2.2.359 \
         @iconify/tailwind4@1.0.6 \
         daisyui@5.0.46 \
@@ -116,10 +116,10 @@ setup_test() {
 )
 
 (
-    echo "# tailwindcss with plugins on separate node_modules"
+    echo "# install: tailwindcss with plugins (separate cli)"
     setup_test
 
-    bun3nix \
+    bun3nix install \
         @iconify/json@2.2.359 \
         @iconify/tailwind4@1.0.6 \
         daisyui@5.0.46 \

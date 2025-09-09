@@ -4,34 +4,20 @@ import * as child_process from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
-import * as util from "node:util";
-
-const arg = util.parseArgs({
-  args: process.argv.slice(2),
-  options: {
-    postinstall: {
-      type: "boolean",
-      default: false,
-    },
-  },
-  allowPositionals: true,
-  strict: true,
-});
-
-if (arg.values.postinstall === false && arg.positionals.length === 0) {
-  console.error("Either --postinstall or package names must be provided");
-  process.exit(1);
-}
-
-if (arg.values.postinstall && arg.positionals.length > 0) {
-  console.error("Cannot provide both --postinstall and package names");
-  process.exit(1);
-}
 
 let cwd = process.cwd();
-if (arg.positionals.length > 0) {
+
+const [subcommand, ...args] = process.argv.slice(2);
+if (subcommand === "install") {
+  if (args.length === 0) {
+    console.error("Usage: bun3nix install <package>...");
+    process.exit(1);
+  }
   cwd = fs.mkdtempSync(`${os.tmpdir()}/bun3nix-`);
-  child_process.execSync(`bun add ${arg.positionals.join(" ")}`, { cwd });
+  child_process.execSync(`bun add ${args.join(" ")}`, { cwd });
+} else if (subcommand !== "postinstall") {
+  console.error("Usage: bun3nix <install|postinstall> [args]");
+  process.exit(1);
 }
 
 const bunLockJsonC = fs.readFileSync(`${cwd}/bun.lock`, "utf-8");
