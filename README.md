@@ -40,9 +40,8 @@ Import it in your own Nix expressions:
 
 ### `postinstall` subcommand
 
-Run this subcommand **after** running `bun install`.  
-This subcommand assumes `bun.lock` are present in the current directory.
-The `node_modules` should also be present if you use github dependencies.
+Run this subcommand **after** running `bun install`. This subcommand assumes `bun.lock` are present
+in the current directory. The `node_modules` should also be present if you use github dependencies.
 
 ```sh
 nix run nixpkgs#bun install is-even @types/bun # generates package.json, bun.lock, and node_modules
