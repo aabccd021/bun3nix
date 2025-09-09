@@ -125,7 +125,7 @@ setup_test() {
         daisyui@5.0.46 \
         tailwindcss@4.1.11 \
         >./plugin_deps.nix
-    bun3nix @tailwindcss/cli@4.1.11 >./cli_deps.nix
+    bun3nix install @tailwindcss/cli@4.1.11 >./cli_deps.nix
 
     cp ./plugin_deps.nix ./plugin_deps_formatted.nix
     nix run nixpkgs#nixfmt -- --strict ./plugin_deps_formatted
