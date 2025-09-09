@@ -28,7 +28,8 @@ bun3nix install @tailwindcss/cli > ./npm_deps.nix
 ### `postinstall`
 
 Run this subcommand **after** running `bun install`.  
-It assumes `node_modules` and `bun.lock` are present in the current directory.
+This subcommand assumes `bun.lock` are present in the current directory.
+`node_modules` should also be present if you use GitHub dependencies.
 
 ```sh
 bun install is-even @types/bun # generates package.json, bun.lock, and node_modules
