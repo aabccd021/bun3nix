@@ -82,9 +82,12 @@ const fetchTextLines = packages.flatMap(({ baseName, modulePath, lockInfo }) => 
   throw new Error(`bun3nix does not support the following dependency: ${nameUrl}`);
 });
 
-const binTextLines = packages.flatMap(({ lockInfo, modulePath }) => {
+const binTextLines = packages.flatMap(({ lockInfo, baseName, modulePath }) => {
   const bins = lockInfo[2].bin;
   if (!bins) {
+    return [];
+  }
+  if (modulePath !== `node_modules/${baseName}/`) {
     return [];
   }
   return Object.entries(bins).flatMap(([binName, binPath]) => [
