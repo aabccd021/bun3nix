@@ -82,6 +82,7 @@ const fetchTextLines = packages.flatMap(({ baseName, modulePath, lockInfo }) => 
   throw new Error(`bun3nix does not support the following dependency: ${nameUrl}`);
 });
 
+const existingBins = new Set();
 const binTextLines = packages.flatMap(({ lockInfo, baseName, modulePath }) => {
   const bins = lockInfo[2].bin;
   if (!bins) {
@@ -90,10 +91,16 @@ const binTextLines = packages.flatMap(({ lockInfo, baseName, modulePath }) => {
   if (modulePath !== `node_modules/${baseName}/`) {
     return [];
   }
-  return Object.entries(bins).flatMap(([binName, binPath]) => [
-    `patchShebangs --host "$out/lib/${modulePath}${binPath}"`,
-    `ln -s "$out/lib/${modulePath}${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
-  ]);
+  return Object.entries(bins).flatMap(([binName, binPath]) => {
+    if (existingBins.has(binName)) {
+      return [];
+    }
+    existingBins.add(binName);
+    return [
+      `patchShebangs --host "$out/lib/${modulePath}${binPath}"`,
+      `ln -s "$out/lib/${modulePath}${binPath}" "$out/lib/node_modules/.bin/${binName}"`,
+    ];
+  });
 });
 
 process.stdout.write(`{
