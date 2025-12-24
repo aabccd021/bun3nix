@@ -39,17 +39,18 @@ const packages = Object.entries(bunLock.packages).map(([name, lockInfo]) => {
   return { baseName, modulePath, lockInfo };
 });
 
-const fetchTextLines = packages.flatMap(({ baseName, modulePath, lockInfo }) => {
+const fetchTextLines = packages.flatMap(({ modulePath, lockInfo }) => {
   const nameUrl = lockInfo[0];
   const hash = lockInfo[3];
 
   const isNpmDep = hash !== undefined;
   if (isNpmDep) {
+    const packageName = nameUrl.substring(0, nameUrl.lastIndexOf("@"));
     const tarballName = path.basename(nameUrl).replaceAll("@", "-");
     return [
       `"${modulePath}" = extractTarball (`,
       `  pkgs.fetchurl {`,
-      `    url = "https://registry.npmjs.org/${baseName}/-/${tarballName}.tgz";`,
+      `    url = "https://registry.npmjs.org/${packageName}/-/${tarballName}.tgz";`,
       `    hash = "${hash}";`,
       `  }`,
       `);`,
